@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" style="background-color: #FFFFFF; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+<rect width="800" height="480" fill="#FFFFFF"/>
+<text x="400.0" y="32" text-anchor="middle" font-size="18" font-weight="bold" fill="#1E293B">Task 6: Population Diversity Trajectory Across Generations</text>
+<line x1="70" y1="420" x2="560" y2="420" stroke="#94A3B8" stroke-width="2"/>
+<line x1="70" y1="60" x2="70" y2="420" stroke="#94A3B8" stroke-width="2"/>
+<line x1="70" y1="420.0" x2="560" y2="420.0" stroke="#E2E8F0" stroke-dasharray="4,4"/>
+<text x="60" y="424.0" text-anchor="end" font-size="11" fill="#64748B">27.5</text>
+<line x1="70" y1="348.0" x2="560" y2="348.0" stroke="#E2E8F0" stroke-dasharray="4,4"/>
+<text x="60" y="352.0" text-anchor="end" font-size="11" fill="#64748B">33.2</text>
+<line x1="70" y1="276.0" x2="560" y2="276.0" stroke="#E2E8F0" stroke-dasharray="4,4"/>
+<text x="60" y="280.0" text-anchor="end" font-size="11" fill="#64748B">39.0</text>
+<line x1="70" y1="204.0" x2="560" y2="204.0" stroke="#E2E8F0" stroke-dasharray="4,4"/>
+<text x="60" y="208.0" text-anchor="end" font-size="11" fill="#64748B">44.7</text>
+<line x1="70" y1="132.0" x2="560" y2="132.0" stroke="#E2E8F0" stroke-dasharray="4,4"/>
+<text x="60" y="136.0" text-anchor="end" font-size="11" fill="#64748B">50.4</text>
+<line x1="70" y1="60.0" x2="560" y2="60.0" stroke="#E2E8F0" stroke-dasharray="4,4"/>
+<text x="60" y="64.0" text-anchor="end" font-size="11" fill="#64748B">56.1</text>
+<text x="70.0" y="440" text-anchor="middle" font-size="11" fill="#64748B">0</text>
+<text x="168.0" y="440" text-anchor="middle" font-size="11" fill="#64748B">10</text>
+<text x="266.0" y="440" text-anchor="middle" font-size="11" fill="#64748B">20</text>
+<text x="364.0" y="440" text-anchor="middle" font-size="11" fill="#64748B">30</text>
+<text x="462.0" y="440" text-anchor="middle" font-size="11" fill="#64748B">40</text>
+<text x="560.0" y="440" text-anchor="middle" font-size="11" fill="#64748B">50</text>
+<text x="315.0" y="465" text-anchor="middle" font-size="13" font-weight="600" fill="#334155">Generation</text>
+<text x="20" y="240.0" text-anchor="middle" transform="rotate(-90 20 240.0)" font-size="13" font-weight="600" fill="#334155">Phenotypic Diversity (Euclidean Gene Distance)</text>
+<polyline points="70.0,315.7 79.8,298.0 89.6,297.2 99.4,258.9 109.2,256.5 119.0,241.7 128.8,223.3 138.6,240.8 148.4,231.2 158.2,229.9 168.0,231.1 177.8,245.6 187.6,238.3 197.4,220.4 207.2,213.8 217.0,224.7 226.8,243.2 236.6,223.9 246.4,239.2 256.2,213.7 266.0,251.5 275.8,231.3 285.6,236.1 295.4,236.6 305.2,244.0 315.0,237.9 324.8,238.2 334.6,265.4 344.4,239.5 354.2,233.0 364.0,248.2 373.8,229.8 383.6,259.0 393.4,240.9 403.2,250.4 413.0,239.4 422.8,228.2 432.6,240.7 442.4,240.5 452.2,258.8 462.0,261.7 471.8,258.8 481.6,280.8 491.4,259.2 501.2,257.6 511.0,264.9 520.8,290.5 530.6,256.9 540.4,274.3 550.2,239.0 560.0,265.7" fill="none" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round"/>
+<line x1="575" y1="80" x2="595" y2="80" stroke="#2563EB" stroke-width="3"/>
+<text x="601" y="84" font-size="12" font-weight="500" fill="#1E293B">Deterministic Crowding GA</text>
+<polyline points="70.0,315.7 79.8,258.5 89.6,188.9 99.4,226.3 109.2,210.1 119.0,93.7 128.8,119.4 138.6,153.6 148.4,217.9 158.2,201.5 168.0,168.6 177.8,181.5 187.6,237.7 197.4,294.5 207.2,204.6 217.0,210.1 226.8,224.4 236.6,247.1 246.4,252.3 256.2,193.6 266.0,258.3 275.8,262.3 285.6,259.9 295.4,330.4 305.2,250.1 315.0,257.6 324.8,336.6 334.6,250.7 344.4,333.7 354.2,308.0 364.0,278.4 373.8,333.8 383.6,340.1 393.4,366.3 403.2,291.2 413.0,318.0 422.8,262.0 432.6,369.7 442.4,352.5 452.2,319.0 462.0,284.8 471.8,308.0 481.6,251.0 491.4,220.4 501.2,347.3 511.0,268.3 520.8,318.3 530.6,363.5 540.4,316.3 550.2,401.7 560.0,374.2" fill="none" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round"/>
+<line x1="575" y1="106" x2="595" y2="106" stroke="#DC2626" stroke-width="3"/>
+<text x="601" y="110" font-size="12" font-weight="500" fill="#1E293B">Standard ACTIVEA GA</text>
+</svg>

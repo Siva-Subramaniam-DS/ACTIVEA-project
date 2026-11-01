@@ -1,0 +1,29 @@
+{
+  "champion": "Gradient Boosting",
+  "dataset": "endomondoHR.csv",
+  "test_rmse": 25.70252489205743,
+  "test_mae": 16.471964430853525,
+  "test_r2": 0.998665266927691,
+  "cv_r2": 0.998354377571491,
+  "features": [
+    "duration_min",
+    "heart_rate_avg",
+    "heart_rate_max",
+    "heart_rate_std",
+    "speed_avg_kmh",
+    "elevation_gain_m",
+    "distance_km",
+    "sport_bike (transport)",
+    "sport_core stability training",
+    "sport_cross-country skiing",
+    "sport_indoor cycling",
+    "sport_mountain bike",
+    "sport_orienteering",
+    "sport_run",
+    "sport_skate",
+    "sport_walk",
+    "gender_male",
+    "gender_unknown"
+  ],
+  "target": "Calories Burn"
+}

@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ACTIVEA - session planner</title>
+<style>
+  :root {
+    --paper: #10141c;
+    --ink: #f4f7fb;
+    --muted: #9aa6b8;
+    --line: #2c3648;
+    --card: #1a2130;
+    --green: #ff6b3d;
+    --green-dark: #e2552a;
+    --mint: #3ecf8e;
+    --heat: #ff6b3d;
+    --shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    color: var(--ink);
+    background: var(--paper);
+    font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+    line-height: 1.45;
+  }
+  header {
+    margin: 18px 7vw 0;
+    min-height: 220px;
+    border-radius: 22px;
+    padding: 28px 32px;
+    background:
+      linear-gradient(100deg, rgba(16, 20, 28, 0.88) 0%, rgba(16, 20, 28, 0.35) 70%),
+      url("images/hero.jpg") center 40% / cover no-repeat;
+    border: 1px solid var(--line);
+  }
+  .kicker {
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-size: 12px;
+    color: var(--mint);
+    font-weight: 700;
+  }
+  h1 {
+    font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+    font-weight: 750;
+    font-size: clamp(36px, 5vw, 56px);
+    margin: 6px 0 4px;
+    letter-spacing: -0.04em;
+  }
+  .lede { max-width: 560px; color: #d5dce8; margin: 0; }
+  .clock { margin-top: 18px; font-variant-numeric: tabular-nums; font-size: 13px; color: #d5dce8; }
+  main { padding: 12px 7vw 64px; }
+  .layout {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 22px;
+    align-items: start;
+  }
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    padding: 18px;
+  }
+  label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .field { margin-bottom: 14px; }
+  input[type="number"], select {
+    width: 100%;
+    border: 1px solid var(--line);
+    background: #121826;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 16px;
+    color: var(--ink);
+  }
+  .goals { display: grid; gap: 8px; }
+  .goals label {
+    margin: 0;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 10px 12px;
+    cursor: pointer;
+    color: var(--ink);
+    background: #121826;
+  }
+  .goals input { margin-right: 8px; }
+  .goals label:has(input:checked) {
+    border-color: var(--green);
+    background: #2a1c18;
+  }
+  .goals small { display: block; color: var(--muted); margin-left: 24px; }
+  button {
+    width: 100%;
+    border: 0;
+    border-radius: 12px;
+    background: var(--green);
+    color: white;
+    font-size: 16px;
+    padding: 12px 14px;
+    cursor: pointer;
+    font-weight: 650;
+  }
+  button:hover { background: var(--green-dark); }
+  button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid #ffb199; outline-offset: 2px; }
+  .status { min-height: 1.2em; color: var(--muted); font-size: 13px; margin-top: 10px; }
+  .score-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; }
+  .score {
+    font-family: "Segoe UI", sans-serif;
+    font-size: 64px;
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    color: var(--mint);
+    white-space: nowrap;
+  }
+  .score span { font-size: 18px; color: var(--muted); }
+  .session { display: grid; gap: 10px; margin-top: 14px; }
+  .now {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 16px;
+    margin-bottom: 14px;
+    align-items: center;
+  }
+  .now img {
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 14px;
+  }
+  .live-name { font-size: 22px; font-weight: 700; }
+  .bpm { font-size: 42px; font-weight: 750; color: var(--green); letter-spacing: -0.04em; }
+  .bpm small { font-size: 14px; color: var(--muted); font-weight: 600; }
+  .block {
+    display: grid;
+    grid-template-columns: 92px 72px 1fr;
+    gap: 12px;
+    align-items: center;
+    border: 1px solid transparent;
+    border-radius: 14px;
+    padding: 8px;
+  }
+  .block.now-row { border-color: var(--green); background: #241812; }
+  .block img { width: 92px; height: 68px; object-fit: cover; border-radius: 10px; }
+  .mins {
+    font-size: 22px;
+    font-weight: 750;
+    color: var(--mint);
+  }
+  .mins small { display: block; font-family: "Segoe UI", sans-serif; font-size: 12px; color: var(--muted); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .chip {
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    border-radius: 999px;
+    padding: 2px 8px;
+    background: #243044;
+    color: var(--mint);
+  }
+  .bars { display: grid; gap: 10px; margin-top: 16px; }
+  .bar-label { display: flex; justify-content: space-between; font-size: 13px; }
+  .track { height: 8px; background: #121826; border-radius: 99px; overflow: hidden; }
+  .fill { height: 100%; background: linear-gradient(90deg, var(--mint), var(--green)); width: 0; }
+  .domains { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+  .dom {
+    width: 42px;
+    text-align: center;
+    border-radius: 8px;
+    padding: 6px 0;
+    font-size: 12px;
+    background: #121826;
+    color: var(--muted);
+  }
+  .dom.on { background: var(--mint); color: #102018; }
+  .wide { margin-top: 22px; }
+  canvas { width: 100%; height: 240px; display: block; }
+  #summary { color: var(--muted); font-size: 14px; text-align: right; }
+  footer { padding: 0 7vw 40px; color: var(--muted); font-size: 13px; }
+  @media (max-width: 900px) {
+    .layout, .now { grid-template-columns: 1fr; }
+    header, main, footer { padding-left: 18px; padding-right: 18px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="kicker">Live session</div>
+  <h1>ACTIVEA</h1>
+  <p class="lede">Your next workout, built for your weight, age and goal. Press plan, then follow the block that is on now.</p>
+  <div class="clock" id="wall">--:--:--</div>
+</header>
+<main>
+  <div class="layout">
+    <form class="panel" id="planner">
+      <div class="field">
+        <label for="weight">Body mass (kg)</label>
+        <input id="weight" type="number" min="40" max="160" step="0.5" value="70">
+      </div>
+      <div class="field">
+        <label for="dream">Dream weight (kg)</label>
+        <input id="dream" type="number" min="40" max="160" step="0.5" value="65">
+      </div>
+      <div class="field">
+        <label for="bmi">BMI</label>
+        <input id="bmi" type="number" min="12" max="50" step="0.1" value="23.5">
+      </div>
+      <div class="field">
+        <label for="gender">Gender</label>
+        <select id="gender">
+          <option value="Male" selected>Male</option>
+          <option value="Female">Female</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="age">Age (years)</label>
+        <input id="age" type="number" min="16" max="90" step="1" value="30">
+      </div>
+      <div class="field">
+        <label for="rhr">Resting heart rate (bpm)</label>
+        <input id="rhr" type="number" min="40" max="100" step="1" value="60">
+      </div>
+      <div class="field">
+        <span class="kicker">Goal band</span>
+        <div class="goals">
+          <label><input type="radio" name="goal" value="general_health"> General health <small>200–400 kcal · lighter mixed work</small></label>
+          <label><input type="radio" name="goal" value="fitness_improvement" checked> Fitness improvement <small>300–500 kcal · moderate cardio and strength</small></label>
+          <label><input type="radio" name="goal" value="weight_loss"> Weight loss <small>400–600 kcal · vigorous mixed work</small></label>
+        </div>
+      </div>
+      <button type="submit">Plan this session</button>
+      <div class="status" id="status">Planning with the lecture checks.</div>
+    </form>
+
+    <section class="panel" aria-live="polite">
+      <div class="now">
+        <img id="now-photo" src="images/jog.jpg" alt="Current activity">
+        <div>
+          <div class="kicker" id="now-kicker">Up next</div>
+          <div class="live-name" id="now-name">Waiting for a plan</div>
+          <div class="bpm" id="now-bpm">– <small>bpm</small></div>
+          <div id="now-meta" style="color:var(--muted);font-size:14px;"></div>
+        </div>
+      </div>
+      <div class="score-row">
+        <div>
+          <div class="kicker">Session fitness</div>
+          <div class="score" id="score">– <span>/ +4</span></div>
+        </div>
+        <div id="summary"></div>
+      </div>
+      <div class="session" id="session"></div>
+      <div class="bars" id="bars"></div>
+      <div class="domains" id="domains"></div>
+    </section>
+  </div>
+
+  <div class="wide">
+    <section class="panel">
+      <div class="kicker">This plan</div>
+      <h2 style="font-weight:650;margin:4px 0 8px;">How the plan improved</h2>
+      <canvas id="chart" width="800" height="240"></canvas>
+    </section>
+  </div>
+</main>
+<footer>
+  ACTIVEA plans a session from the coursework activity table. Calories use the 70 kg rate scaled by body mass. Playback is one planned minute per second.
+</footer>
+<script>
+/* kcal/min = (kcal/min at 70 kg) * (body mass / 70), from the coursework table. */
+const POOL = [
+  { name: "Jogging", kcal70: 7.35, met: 6.0, rpe: 5.0, hr: 73.5, domains: ["CV", "ME", "FM"] },
+  { name: "Bodyweight squats", kcal70: 4.90, met: 4.0, rpe: 6.0, hr: 67.0, domains: ["ST", "ME", "BA", "FM"] },
+  { name: "Cycling (moderate)", kcal70: 6.80, met: 5.5, rpe: 4.0, hr: 70.0, domains: ["CV", "ME"] },
+  { name: "Plank", kcal70: 3.50, met: 3.0, rpe: 7.0, hr: 64.0, domains: ["ST", "ME", "BA"] },
+  { name: "Yoga", kcal70: 3.00, met: 2.5, rpe: 3.0, hr: 60.0, domains: ["FL", "BA", "FM"] },
+  { name: "Rope skipping", kcal70: 11.00, met: 9.0, rpe: 8.0, hr: 83.0, domains: ["CV", "AG", "ME", "FM"] },
+  { name: "Running", kcal70: 10.50, met: 8.5, rpe: 7.0, hr: 81.0, domains: ["CV", "ME", "FM"] },
+  { name: "Brisk walking", kcal70: 4.10, met: 3.5, rpe: 3.0, hr: 60.0, domains: ["CV", "FM"] },
+  { name: "Pushups & Calisthenics", kcal70: 5.60, met: 4.5, rpe: 6.0, hr: 70.0, domains: ["ST", "ME", "FM"] },
+  { name: "Agility drills & Burpees", kcal70: 9.80, met: 8.0, rpe: 8.0, hr: 85.0, domains: ["CV", "AG", "ST", "FM"] }
+];
+const ALL_DOMAINS = ["CV", "ST", "ME", "FL", "BA", "AG", "FM"];
+const PHOTOS = {
+  "Jogging": "images/jog.jpg",
+  "Running": "images/jog.jpg",
+  "Brisk walking": "images/jog.jpg",
+  "Rope skipping": "images/jog.jpg",
+  "Cycling (moderate)": "images/cycle.jpg",
+  "Yoga": "images/yoga.jpg",
+  "Bodyweight squats": "images/strength.jpg",
+  "Plank": "images/strength.jpg",
+  "Pushups & Calisthenics": "images/strength.jpg",
+  "Agility drills & Burpees": "images/strength.jpg"
+};
+function photoFor(name) {
+  return PHOTOS[name] || "images/jog.jpg";
+}
+let liveTimer = null;
+const GOALS = {
+  general_health: { cal: [200, 400], met: [3.0, 6.0], rpe: [3.0, 6.0], hr: [55, 75] },
+  fitness_improvement: { cal: [300, 500], met: [4.5, 7.5], rpe: [4.0, 7.0], hr: [64, 80] },
+  weight_loss: { cal: [400, 600], met: [5.5, 9.0], rpe: [5.0, 8.5], hr: [70, 88] }
+};
+
+function makeRng(seed) {
+  let state = seed >>> 0;
+  return {
+    next() {
+      state = (1664525 * state + 1013904223) >>> 0;
+      return state / 4294967296;
+    },
+    int(lo, hi) { return lo + Math.floor(this.next() * (hi - lo + 1)); },
+    pick(list) { return list[Math.floor(this.next() * list.length)]; },
+    sample(list, n) {
+      const copy = list.slice();
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(this.next() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy.slice(0, n);
+    }
+  };
+}
+
+function clip(duration) {
+  return Math.max(5, Math.min(45, Math.round(duration * 10) / 10));
+}
+
+function formatMins(value) {
+  const rounded = Math.round(value * 10) / 10;
+  return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1);
+}
+
+function formatKcal(value) {
+  return (Math.round(value * 10) / 10).toFixed(1);
+}
+
+function blockKcal(gene, weight) {
+  return gene.activity.kcal70 * (weight / 70) * gene.duration;
+}
+
+function checkScore(pass) {
+  return pass ? 1 : -1;
+}
+
+/* Lecture rule (Code 2): +1 inside a check, -1 outside.
+   Calories use the goal band from the brief. MET, RPE and % MHR use the lecture checks. */
+function evaluateSession(session, weight, goal) {
+  const minutes = session.reduce((sum, gene) => sum + gene.duration, 0);
+  if (minutes <= 0 || session.length === 0) {
+    return { fitness: -4, kcal: 0, minutes: 0, met: 0, rpe: 0, hr: 0, domains: [], parts: {}, blockKcal: [] };
+  }
+  const calories = session.map(gene => blockKcal(gene, weight));
+  const kcal = calories.reduce((sum, value) => sum + value, 0);
+  const met = session.reduce((sum, gene) => sum + gene.activity.met * gene.duration, 0) / minutes;
+  const rpe = session.reduce((sum, gene) => sum + gene.activity.rpe * gene.duration, 0) / minutes;
+  const hr = session.reduce((sum, gene) => sum + gene.activity.hr * gene.duration, 0) / minutes;
+  const domains = [...new Set(session.flatMap(gene => gene.activity.domains))];
+  const parts = {
+    cal: checkScore(kcal >= goal.cal[0] && kcal <= goal.cal[1]),
+    met: checkScore(met >= 4.0),
+    rpe: checkScore(rpe >= 4.0 && rpe <= 7.0),
+    hr: checkScore(hr >= 64.0 && hr <= 80.0)
+  };
+  const fitness = parts.cal + parts.met + parts.rpe + parts.hr;
+  return { fitness, kcal, minutes, met, rpe, hr, domains, parts, blockKcal: calories };
+}
+
+function scoreAll(population, weight, goal) {
+  return population.map(session => evaluateSession(session, weight, goal));
+}
+
+/* Generational GA. Eiben and Smith (2015), Fig. 2.1.
+   Tournament k = 3. Elitism E = 2 (Goldberg, 1989).
+   Recombination sums a repeated activity, then partitions the set.
+   Mutation probability 0.15 on duration, substitution, insert, and delete. */
+function evolve(profile, goal, onStep) {
+  const rng = makeRng(42);
+  const popSize = 40;
+  const generations = 40;
+  const crossoverRate = 0.8;
+  const mutationRate = 0.15;
+
+  function fresh() {
+    const count = rng.int(2, 4);
+    return rng.sample(POOL, count).map(activity => ({
+      activity,
+      duration: clip(8 + rng.next() * 22)
+    }));
+  }
+  function dedupe(items) {
+    const order = [];
+    const totals = new Map();
+    items.forEach(gene => {
+      if (!totals.has(gene.activity)) order.push(gene.activity);
+      totals.set(gene.activity, (totals.get(gene.activity) || 0) + gene.duration);
+    });
+    return order.map(activity => ({ activity, duration: clip(totals.get(activity)) }));
+  }
+  function repair(child, donors) {
+    let genes = dedupe(child);
+    const used = new Set(genes.map(gene => gene.activity));
+    donors.forEach(gene => {
+      if (genes.length >= 2) return;
+      if (!used.has(gene.activity)) {
+        genes.push({ activity: gene.activity, duration: clip(gene.duration) });
+        used.add(gene.activity);
+      }
+    });
+    if (genes.length > 5) genes = rng.sample(genes, 5);
+    if (genes.length < 2) return fresh();
+    return genes;
+  }
+  function crossover(a, b) {
+    if (rng.next() >= crossoverRate) {
+      return [a.map(gene => ({ ...gene })), b.map(gene => ({ ...gene }))];
+    }
+    const totals = new Map();
+    const order = [];
+    a.concat(b).forEach(gene => {
+      if (!totals.has(gene.activity)) order.push(gene.activity);
+      totals.set(gene.activity, (totals.get(gene.activity) || 0) + gene.duration);
+    });
+    const shuffled = rng.sample(order, order.length);
+    if (shuffled.length < 2) return [a.map(gene => ({ ...gene })), b.map(gene => ({ ...gene }))];
+    const split = rng.int(1, shuffled.length - 1);
+    const childA = shuffled.slice(0, split).map(activity => ({ activity, duration: totals.get(activity) }));
+    const childB = shuffled.slice(split).map(activity => ({ activity, duration: totals.get(activity) }));
+    return [repair(childA, a.concat(b)), repair(childB, b.concat(a))];
+  }
+  function mutate(individual) {
+    const genes = individual.map(gene => ({ ...gene }));
+    genes.forEach(gene => {
+      if (rng.next() < mutationRate) {
+        const delta = rng.pick([-10, -5, -2, 2, 5, 10]);
+        gene.duration = clip(gene.duration + delta);
+      }
+    });
+    if (genes.length && rng.next() < mutationRate) {
+      const used = new Set(genes.map(gene => gene.activity));
+      const available = POOL.filter(activity => !used.has(activity));
+      if (available.length) genes[rng.int(0, genes.length - 1)].activity = rng.pick(available);
+    }
+    if (genes.length < 5 && rng.next() < mutationRate) {
+      const used = new Set(genes.map(gene => gene.activity));
+      const available = POOL.filter(activity => !used.has(activity));
+      if (available.length) genes.push({ activity: rng.pick(available), duration: clip(8 + rng.next() * 12) });
+    }
+    if (genes.length > 2 && rng.next() < mutationRate) genes.splice(rng.int(0, genes.length - 1), 1);
+    return repair(genes, individual);
+  }
+  function tournament(population, fitness) {
+    const contenders = rng.sample(population.map((_, index) => index), 3);
+    let best = contenders[0];
+    contenders.forEach(index => { if (fitness[index] > fitness[best]) best = index; });
+    return population[best];
+  }
+
+  let population = Array.from({ length: popSize }, fresh);
+  let scored = scoreAll(population, profile.weight, goal);
+  let fitness = scored.map(row => row.fitness);
+  let bestIndex = fitness.indexOf(Math.max(...fitness));
+  let best = population[bestIndex].map(gene => ({ ...gene }));
+  let bestFitness = fitness[bestIndex];
+  let bestResult = scored[bestIndex];
+  const history = [{ generation: 0, best: bestFitness, mean: fitness.reduce((s, v) => s + v, 0) / fitness.length }];
+
+  for (let generation = 1; generation <= generations; generation++) {
+    const ranked = fitness.map((value, index) => ({ value, index })).sort((a, b) => b.value - a.value);
+    const elites = [];
+    const seen = new Set();
+    ranked.forEach(item => {
+      if (elites.length >= 2) return;
+      const key = population[item.index].map(gene => gene.activity.name + ":" + gene.duration).join("|");
+      if (seen.has(key)) return;
+      seen.add(key);
+      elites.push(population[item.index].map(gene => ({ ...gene })));
+    });
+    const offspring = [];
+    while (offspring.length < popSize - elites.length) {
+      const [childA, childB] = crossover(tournament(population, fitness), tournament(population, fitness));
+      offspring.push(mutate(childA));
+      if (offspring.length < popSize - elites.length) offspring.push(mutate(childB));
+    }
+    population = elites.concat(offspring);
+    scored = scoreAll(population, profile.weight, goal);
+    fitness = scored.map(row => row.fitness);
+    const current = fitness.indexOf(Math.max(...fitness));
+    if (fitness[current] > bestFitness) {
+      bestFitness = fitness[current];
+      best = population[current].map(gene => ({ ...gene }));
+      bestResult = scored[current];
+    }
+    history.push({
+      generation,
+      best: bestFitness,
+      mean: fitness.reduce((sum, value) => sum + value, 0) / fitness.length
+    });
+    if (onStep) onStep(generation, generations);
+  }
+  return { best, result: bestResult, history };
+}
+
+function drawChart(history) {
+  const canvas = document.getElementById("chart");
+  const ctx = canvas.getContext("2d");
+  const width = canvas.width;
+  const height = canvas.height;
+  ctx.clearRect(0, 0, width, height);
+  ctx.fillStyle = "#1a2130";
+  ctx.fillRect(0, 0, width, height);
+  const pad = { l: 42, r: 16, t: 16, b: 28 };
+  const plotW = width - pad.l - pad.r;
+  const plotH = height - pad.t - pad.b;
+  ctx.strokeStyle = "#2c3648";
+  ctx.lineWidth = 1;
+  for (let tick = 0; tick <= 4; tick++) {
+    const y = pad.t + (plotH * tick) / 4;
+    ctx.beginPath();
+    ctx.moveTo(pad.l, y);
+    ctx.lineTo(width - pad.r, y);
+    ctx.stroke();
+    ctx.fillStyle = "#9aa6b8";
+    ctx.font = "12px Segoe UI";
+    ctx.fillText(String(4 - tick * 2), 8, y + 4);
+  }
+  function line(key, color) {
+    ctx.beginPath();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    history.forEach((row, index) => {
+      const x = pad.l + (plotW * index) / Math.max(1, history.length - 1);
+      const y = pad.t + plotH * (1 - (row[key] + 4) / 8);
+      if (index === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+  }
+  line("mean", "#5c6b82");
+  line("best", "#ff6b3d");
+  ctx.fillStyle = "#9aa6b8";
+  ctx.fillText("Generation", width / 2 - 30, height - 6);
+}
+
+function signed(value) {
+  return (value > 0 ? "+" : "") + value;
+}
+
+function render(best, result) {
+  document.getElementById("score").innerHTML = signed(result.fitness) + " <span>/ +4</span>";
+  document.getElementById("summary").textContent =
+    formatKcal(result.kcal) + " kcal · " + formatMins(result.minutes) + " min · " + result.hr.toFixed(0) + "% MHR";
+
+  const session = document.getElementById("session");
+  session.replaceChildren();
+  best.forEach((gene, index) => {
+    const row = document.createElement("article");
+    row.className = "block";
+    const photo = document.createElement("img");
+    photo.src = photoFor(gene.activity.name);
+    photo.alt = "";
+    const mins = document.createElement("div");
+    mins.className = "mins";
+    mins.innerHTML = formatMins(gene.duration) + "<small>min</small>";
+    const body = document.createElement("div");
+    const title = document.createElement("strong");
+    title.textContent = gene.activity.name;
+    const meta = document.createElement("div");
+    meta.style.color = "#9aa6b8";
+    meta.style.fontSize = "13px";
+    const slice = result.blockKcal[index];
+    meta.textContent = formatKcal(slice) + " kcal · " + gene.activity.met.toFixed(1) + " MET · RPE " + gene.activity.rpe.toFixed(0);
+    const chips = document.createElement("div");
+    chips.className = "chips";
+    gene.activity.domains.forEach(domain => {
+      const chip = document.createElement("span");
+      chip.className = "chip";
+      chip.textContent = domain;
+      chips.appendChild(chip);
+    });
+    body.append(title, meta, chips);
+    row.append(photo, mins, body);
+    session.appendChild(row);
+  });
+  playSession(best.map((gene, index) => ({
+    activity: gene.activity,
+    duration: gene.duration,
+    kcal: result.blockKcal[index]
+  })));
+
+  const bars = document.getElementById("bars");
+  bars.replaceChildren();
+  [
+    ["Calories", result.parts.cal, formatKcal(result.kcal) + " kcal"],
+    ["MET", result.parts.met, result.met.toFixed(2)],
+    ["RPE", result.parts.rpe, result.rpe.toFixed(1) + " / 10"],
+    ["Heart rate", result.parts.hr, result.hr.toFixed(0) + "% MHR"]
+  ].forEach(([name, mark, text]) => {
+    const wrap = document.createElement("div");
+    const label = document.createElement("div");
+    label.className = "bar-label";
+    const left = document.createElement("span");
+    left.textContent = name;
+    const right = document.createElement("span");
+    right.textContent = text + " · " + signed(mark);
+    label.append(left, right);
+    const track = document.createElement("div");
+    track.className = "track";
+    const fill = document.createElement("div");
+    fill.className = "fill";
+    fill.style.width = mark > 0 ? "100%" : "8%";
+    track.appendChild(fill);
+    wrap.append(label, track);
+    bars.appendChild(wrap);
+  });
+
+  const domains = document.getElementById("domains");
+  domains.replaceChildren();
+  ALL_DOMAINS.forEach(domain => {
+    const cell = document.createElement("div");
+    cell.className = "dom" + (result.domains.includes(domain) ? " on" : "");
+    cell.textContent = domain;
+    domains.appendChild(cell);
+  });
+}
+
+function playSession(blocks) {
+  if (liveTimer) clearInterval(liveTimer);
+  const total = blocks.reduce((sum, block) => sum + block.duration, 0);
+  let minute = 1;
+  const tick = () => {
+    const elapsed = Math.min(minute, total);
+    let walked = 0;
+    let current = blocks[blocks.length - 1];
+    let into = current.duration;
+    let kcal = 0;
+    blocks.forEach(block => {
+      const used = Math.max(0, Math.min(block.duration, elapsed - walked));
+      kcal += (block.kcal / block.duration) * used;
+      if (elapsed > walked && elapsed <= walked + block.duration) {
+        current = block;
+        into = elapsed - walked;
+      }
+      walked += block.duration;
+    });
+    document.querySelectorAll(".block").forEach((row, index) => {
+      row.classList.toggle("now-row", blocks[index] === current);
+    });
+    const photo = document.getElementById("now-photo");
+    photo.src = photoFor(current.activity.name);
+    photo.alt = current.activity.name;
+    document.getElementById("now-kicker").textContent =
+      "On now · minute " + formatMins(into) + " of " + formatMins(current.duration);
+    document.getElementById("now-name").textContent = current.activity.name;
+    document.getElementById("now-bpm").innerHTML = current.activity.hr.toFixed(0) + " <small>% MHR</small>";
+    document.getElementById("now-meta").textContent =
+      formatKcal(kcal) + " kcal so far · " + formatMins(elapsed) + " / " + formatMins(total) + " min";
+    minute += 1;
+    if (minute > total) minute = 1;
+  };
+  tick();
+  liveTimer = setInterval(tick, 1000);
+}
+
+function readProfile() {
+  return {
+    weight: Number(document.getElementById("weight").value),
+    dream: Number(document.getElementById("dream").value),
+    bmi: Number(document.getElementById("bmi").value),
+    gender: document.getElementById("gender").value,
+    age: Number(document.getElementById("age").value),
+    resting: Number(document.getElementById("rhr").value)
+  };
+}
+
+function runPlanner() {
+  const profile = readProfile();
+  const goalName = document.querySelector('input[name="goal"]:checked').value;
+  const status = document.getElementById("status");
+  const valid = profile.weight >= 40 && profile.weight <= 160
+    && profile.dream >= 40 && profile.dream <= 160
+    && profile.bmi >= 12 && profile.bmi <= 50
+    && profile.age >= 16 && profile.age <= 90
+    && profile.resting >= 40 && profile.resting <= 100
+    && (profile.gender === "Male" || profile.gender === "Female");
+  if (!valid) {
+    status.textContent = "Check body mass, dream weight, BMI, age and resting heart rate.";
+    return;
+  }
+  status.textContent = "Planning the session…";
+  const { best, result, history } = evolve(profile, GOALS[goalName]);
+  render(best, result);
+  drawChart(history);
+  status.textContent = "Lecture checks · generation " + (history.length - 1) + " · best " + signed(result.fitness);
+}
+
+document.getElementById("planner").addEventListener("submit", event => {
+  event.preventDefault();
+  runPlanner();
+});
+setInterval(() => {
+  const wall = document.getElementById("wall");
+  if (wall) wall.textContent = new Date().toLocaleTimeString();
+}, 1000);
+document.getElementById("wall").textContent = new Date().toLocaleTimeString();
+runPlanner();
+</script>
+</body>
+</html>

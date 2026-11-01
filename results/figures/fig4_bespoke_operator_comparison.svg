@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" style="background-color: #FFFFFF; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+<rect width="800" height="480" fill="#FFFFFF"/>
+<text x="400.0" y="32" text-anchor="middle" font-size="18" font-weight="bold" fill="#1E293B">Task 7: Convergence Speedup with Bespoke Caloric & Domain Repair Operator</text>
+<line x1="70" y1="420" x2="560" y2="420" stroke="#94A3B8" stroke-width="2"/>
+<line x1="70" y1="60" x2="70" y2="420" stroke="#94A3B8" stroke-width="2"/>
+<line x1="70" y1="420.0" x2="560" y2="420.0" stroke="#E2E8F0" stroke-dasharray="4,4"/>
+<text x="60" y="424.0" text-anchor="end" font-size="11" fill="#64748B">88.3</text>
+<line x1="70" y1="348.0" x2="560" y2="348.0" stroke="#E2E8F0" stroke-dasharray="4,4"/>
+<text x="60" y="352.0" text-anchor="end" font-size="11" fill="#64748B">91.5</text>
+<line x1="70" y1="276.0" x2="560" y2="276.0" stroke="#E2E8F0" stroke-dasharray="4,4"/>
+<text x="60" y="280.0" text-anchor="end" font-size="11" fill="#64748B">94.6</text>
+<line x1="70" y1="204.0" x2="560" y2="204.0" stroke="#E2E8F0" stroke-dasharray="4,4"/>
+<text x="60" y="208.0" text-anchor="end" font-size="11" fill="#64748B">97.7</text>
+<line x1="70" y1="132.0" x2="560" y2="132.0" stroke="#E2E8F0" stroke-dasharray="4,4"/>
+<text x="60" y="136.0" text-anchor="end" font-size="11" fill="#64748B">100.9</text>
+<line x1="70" y1="60.0" x2="560" y2="60.0" stroke="#E2E8F0" stroke-dasharray="4,4"/>
+<text x="60" y="64.0" text-anchor="end" font-size="11" fill="#64748B">104.0</text>
+<text x="70.0" y="440" text-anchor="middle" font-size="11" fill="#64748B">0</text>
+<text x="168.0" y="440" text-anchor="middle" font-size="11" fill="#64748B">10</text>
+<text x="266.0" y="440" text-anchor="middle" font-size="11" fill="#64748B">20</text>
+<text x="364.0" y="440" text-anchor="middle" font-size="11" fill="#64748B">30</text>
+<text x="462.0" y="440" text-anchor="middle" font-size="11" fill="#64748B">40</text>
+<text x="560.0" y="440" text-anchor="middle" font-size="11" fill="#64748B">50</text>
+<text x="315.0" y="465" text-anchor="middle" font-size="13" font-weight="600" fill="#334155">Generation</text>
+<text x="20" y="240.0" text-anchor="middle" transform="rotate(-90 20 240.0)" font-size="13" font-weight="600" fill="#334155">Fitness Score (0-100)</text>
+<polyline points="70.0,313.0 79.8,187.5 89.6,187.5 99.4,187.5 109.2,187.5 119.0,181.0 128.8,181.0 138.6,181.0 148.4,181.0 158.2,180.4 168.0,180.4 177.8,180.4 187.6,180.4 197.4,174.0 207.2,174.0 217.0,174.0 226.8,174.0 236.6,174.0 246.4,174.0 256.2,174.0 266.0,174.0 275.8,174.0 285.6,174.0 295.4,174.0 305.2,174.0 315.0,174.0 324.8,174.0 334.6,174.0 344.4,174.0 354.2,174.0 364.0,174.0 373.8,174.0 383.6,174.0 393.4,174.0 403.2,174.0 413.0,174.0 422.8,174.0 432.6,174.0 442.4,174.0 452.2,174.0 462.0,174.0 471.8,174.0 481.6,174.0 491.4,174.0 501.2,174.0 511.0,174.0 520.8,174.0 530.6,174.0 540.4,174.0 550.2,174.0 560.0,174.0" fill="none" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round"/>
+<line x1="575" y1="80" x2="595" y2="80" stroke="#2563EB" stroke-width="3"/>
+<text x="601" y="84" font-size="12" font-weight="500" fill="#1E293B">Bespoke Repair GA (Task 7)</text>
+<polyline points="70.0,313.0 79.8,305.5 89.6,287.9 99.4,282.2 109.2,282.2 119.0,282.2 128.8,282.2 138.6,281.8 148.4,277.6 158.2,277.6 168.0,277.6 177.8,277.6 187.6,254.6 197.4,211.9 207.2,211.9 217.0,211.9 226.8,211.9 236.6,211.9 246.4,196.6 256.2,196.6 266.0,196.6 275.8,196.6 285.6,196.6 295.4,196.6 305.2,196.6 315.0,196.6 324.8,196.6 334.6,196.6 344.4,186.7 354.2,186.7 364.0,186.7 373.8,186.7 383.6,186.7 393.4,186.7 403.2,186.7 413.0,186.7 422.8,186.7 432.6,186.7 442.4,186.7 452.2,186.7 462.0,186.7 471.8,186.7 481.6,186.7 491.4,186.7 501.2,186.7 511.0,186.7 520.8,186.7 530.6,186.7 540.4,186.7 550.2,186.7 560.0,186.7" fill="none" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round"/>
+<line x1="575" y1="106" x2="595" y2="106" stroke="#DC2626" stroke-width="3"/>
+<text x="601" y="110" font-size="12" font-weight="500" fill="#1E293B">Standard ACTIVEA GA</text>
+</svg>
