@@ -1,0 +1,558 @@
+=== PAGE 1 ===
+ 
+Version academic year 26/27 
+DG4COM Computational Intelligence 
+Purpose of an assessment brief  
+(How should I use this brief to help with my assessment?) 
+This brief gives you key information and guidance about your assessment. It’s the starting 
+point for your work, and your module tutors will refer to it during assessment discussions. 
+Read the brief carefully, along with any other materials your tutors provide, and use them to 
+help you plan and complete your assessment. 
+1.0 Essential Information  
+ 
+Module Code and Title DG4COM Computational Intelligence 
+Module/Assessment Lead contact Prof Aniko Ekart a.ekart@aston.ac.uk 
+Assessment Title ACTIVEA 
+Physical Activity Planning Evolutionary Algorithm 
+Assessment weighting 
+ 
+20% code 
+30% report 
+50% presentation 
+Submission Date and Time 6 November 2026, 12:00 for report and codebase 
+Word Count 
+Lengths of presentation  
+ 
+1700 words  
+8 min (+ 5 mins Q & A) 
+ 
+2.0 Assessment Overview  
+ 
+Assessment Mode (What do I need to produce at the end?) 
+To complete the assignment, you will need to produce: 
+a. A codebase A piece of software that you will design, implement, test and run 
+individually. This is worth 20% of the module mark. You will import existing 
+libraries to implement your software’s  core functionality , and you will write 
+original code whilst completing the coursework tasks. Make sure your code is 
+syntactically and semantically correct (compiles, runs, and generates a meal 
+plan that meets the requirements set out in the tasks’ description). Add 
+comments to explain the logic implemented in ever y method and class. Pay 
+attention to code design: complex logic should be divided across several 
+simpler classes and methods. Write appropriate unit tests. 
+b. A report  A 1700 word ( ±10%) written piece that you will prepare individually.  
+This is worth 30% of the module mark. The report is aimed at a technical 
+readership. Include in your report (1) the technical insights necessary for 
+comprehending the codebase, (2) the experimental setup and results obtained 
+whilst completing the coursework tasks, and (3) the critical analysis of the 
+
+=== PAGE 2 ===
+ 
+Version academic year 26/27 
+previous two items. The critical analysis part of the report should justify your 
+implementation and experimental design choices, explain the influence of the 
+algorithm components (representation, genetic and selection operators, 
+fitness function, termination criteria) on its performance (solution quality) and 
+discuss the experimental results to support the points made throughout. 
+Support all claims with appropriate evidence (content taught throughout the 
+module, findings extracted from additional reading, experimental results, etc.). 
+Pay adequate attention to the eloquence of the arguments you make, the 
+conciseness and clarity of the narrative, the grammar, punctuation, and 
+spelling of your report. 
+A presentation An 8 min (±10%) oral summary of your report and software, including 
+a live demonstration of your software, that you will present during the week 2-6 
+November 2026. You will prepare a set of slides to support your presentation. You will 
+prepare the slides and deliver the presentation individually. This is worth 50% of the 
+module mark. The presentation is aimed at a general technical audience audience. 
+Include in your slides diagrams and schematics covering the essentials of your code, 
+experiments and conclusions. Accompany those with a commentary that avoids 
+technical jargon and uses plain language to convey your findings. As part of the 
+presentation include a live demonstration of your code. Following the presentation 
+there will be 5 minutes for questions and answers. 
+Task Description (What do I have to do for this assessment?)  
+Design, implement and evaluate an evolutionary algorithm for evolving physical 
+exercise sessions. An exercise session is a set of physical activities that a person 
+performs in one workout, each with a specified duration, as illustrated below: 
+𝑠𝑒𝑠𝑠𝑖𝑜𝑛1 = {(𝑗𝑜𝑔𝑔𝑖𝑛𝑔, 20), (𝑏𝑜𝑑𝑦𝑤𝑒𝑖𝑔ℎ𝑡_𝑠𝑞𝑢𝑎𝑡𝑠, 10)} 
+𝑠𝑒𝑠𝑠𝑖𝑜𝑛2 = {(𝑏𝑖𝑐𝑦𝑐𝑙𝑖𝑛𝑔, 30), (𝑝𝑙𝑎𝑛𝑘, 5), (𝑦𝑜𝑔𝑎, 15)} 
+Each activity in a session has a name and a duration in minutes. For example, the 
+first session above contains 20 minutes of jogging and 10 minutes of squats, whereas 
+the second comprises 30 minutes of cycling, 5 minutes of planking, and 15 minutes 
+of yoga. 
+Each session has: a caloric expenditure (calories burned), and several associated 
+exercise intensity metrics. The calories burned per minute and the exercise 
+intensity metrics for each activity are stored separately, as shown below (fill in the 
+remaining columns with appropriate values from reliable sources): 
+Activity Calories/min MET Target RPE Target HR [%] Fitness domain 
+Jogging 7.35 6 5 70-77 CV, ME, FM 
+
+=== PAGE 3 ===
+ 
+Version academic year 26/27 
+Bodyweight 
+squats 4.9 4 6 64-70 ST, ME, BA, FM  
+Cycling 
+(moderate) 
+  
+ 
+  
+Plank      
+Yoga      
+Rope skipping      
+Running      
+Note that the calories/min are shown for a 70 kg adult and these would need to be 
+modified to correspond to a person’s weight. 
+Exercise sessions are evaluated using measurable exercise intensity metrics 
+components: 
+• Metabolic Expenditure Rate (MET): a simple, practical, and easy way for 
+expressing the energy cost of physical activities as a multiple of the resting 
+metabolic rate1.  
+• Target Rate of Perceived Exertion (RPE): the planned level of perceived effort—
+expressed on an established RPE scale—that an individual should aim to reach 
+during an exercise session to achieve the intended training intensity 
+• Target Heart Rate (HR): the planned heart‑rate range, expressed as a percentage 
+of maximum heart rate that a person should reach during exercise to achieve a 
+specific intensity level, such as the moderate zone (64–76% MHR) or vigorous 
+zone (77–93% MHR). 
+These are all known exercise-science metrics and can be sourced from reputable 
+databases and publications. 
+Fitness domains —such as cardiovascular fitness, strength, mobility, agility, balance 
+and functional movement— are added to the exercise-science based metrics, as 
+they provide a practical way to describe the different qualities an exercise develops 
+so they help structure planning and comparison even though they are classifications 
+rather than formal exercise-science metrics: 
+• Cardiovascular Fitness (CV): the ability to sustain activity through efficient 
+heart-lung oxygen delivery.  
+• Strength Development (ST): the ability of muscles to generate maximal or high 
+levels of force.  
+• Muscular Endurance (ME): the ability of muscles to perform repeated efforts or 
+maintain contractions over time.  
+ 
+1 Jetté M, Sidney K, Blümchen G. Metabolic equivalents (METS) in exercise testing, exercise 
+prescription, and evaluation of functional capacity. Clin Cardiol. 1990 Aug;13(8):555 -65. doi: 
+10.1002/clc.4960130809 
+Populate with 
+appropriate data  
+
+
+=== PAGE 4 ===
+ 
+Version academic year 26/27 
+• Flexibility/Mobility (FL): the ability to move joints freely through a full, usable 
+range of motion.  
+• Balance & Stability (BA): the ability to maintain body control during static or 
+dynamic positions. 
+• Agility (AG): the ability to change direction quickly and efficiently with 
+coordinated body control. 
+• Functional Movement (FM): the ability to perform natural, everyday movement 
+patterns efficiently and safely. 
+The core version of the algorithm suggests one ideal session, i.e., a combination of 
+items from a given set of available activities that provides optimal exercise quality 
+within the healthy caloric expenditure range. In other words, the algorithm’s job is to 
+find the healthiest session out of all possible combinations of activities from a given 
+set. 
+What makes a session healthy, depends on the fitness level and the target of the 
+individual. The general recommendation is to plan mixed exercise sessions for 
+burning 300-600 calories. For more precise targets, the following recommendations 
+are made:  
+• for general health  200–400 calories/session consisting of  light-to-moderate 
+mixed sessions (such as walking, strength, mobility) 
+• for fitness improvement, 300–500 calories/session 
+(Moderate cardio, strength circuits) and  
+• for weight loss or higher-intensity training, 400–600 calories/session (such as 
+vigorous cardio, interval training, or heavy mixed sessions). 
+It is also expected that a healthy session includes adequate fitness domain support. 
+ 
+Core tasks (up to 69 marks) 
+Develop a basic version of ACTIVEA that evolves the combination of activities for one 
+session, i.e., suggests the exercise plan for one session . To do this, complete the 
+following tasks: 
+1. Data setup. Compile the set of possible activities to make up the session  and 
+complete the exercise quality table for each. Separate training data from testing 
+data.  
+2. Algorithm setup. Choose the type of evolutionary algorithm you will be 
+implementing: Genetic Algorithm, Genetic Programming, Evolutionary 
+Strategies, etc. Select the genetic operators (crossover, mutation, 
+reproduction, etc.) and configure them to match th e chosen chromosomal 
+representation (linear, hierarchical, graph, etc.). Define the fitness function, 
+
+=== PAGE 5 ===
+ 
+Version academic year 26/27 
+i.e., define a mathematical equation that captures the part of the overview 
+explaining what makes a healthy exercise session (consult reliable exercise -
+science websites or hardcopy resources to identify the recommended values 
+and ranges for MET, target RPE, target HR and fitness domains).  Choose the 
+selection operator and define the termination criteria. Make notes of the 
+rationale behind your choices (citing supporting evidence from lecture content 
+and background reading). 
+3. Algorithm implementation. Write the ACTIVEA code in accordance with the 
+setup completed in the previous task. You may do this from scratch or by 
+importing and customising a pre-existing library (DEAP, GPLearn, etc.). Run the 
+core ACTIVEA algorithm and record the experimental results alongside your 
+interpretation. Make notes of the implementation details to document the 
+technical aspects of your code. 
+4. Nature-inspired optimisation. Select one nature-inspired algorithm out of those 
+discussed in week 3, retrieve a publicly available implementation of that 
+algorithm and run it on the same data used to train and test ACTIVEA. Compare 
+the results against those generated by the ACTIVEA algorithm completed in the 
+previous task. Make notes capturing your experimental insights regarding the 
+likely causes of the differences between the exercise session  
+recommendations produced by running the nature -inspired algorithm and  
+ACTIVEA, respectively.  
+5. Parameter management. Run systematic experiments to fine -tune ACTIVEA 
+parameters: population size, number of generations, genetic operator and 
+selection probabilities, etc. Follow the procedure outlined in the relevant 
+practical (week 4). Make notes of the experimental setup, results and analysis. 
+6.  Diversity analysis. Enhance the ACTIVEA algorithm implemented in task 3 by 
+adding one diversity preservation technique out of those discussed in week 4. 
+Run the original version of ACTIVEA against the enhanced one and compare the 
+results. Make notes to document your additional code and capture your 
+experimental insights regarding the likely causes of the differences in the two 
+exercise session recommendations. 
+ 
+Advanced tasks (70+ marks)  
+After completing all core tasks (1 through to 6), perform two of the following advanced 
+tasks. 
+7. Improve the ACTIVEA algorithm by enhancing one of its genetic operators. 
+Specifically, implement a bespoke crossover or mutation operator that 
+improves the algorithm’s chances of identifying the optimal physical activity  
+recommendation in as computationally efficient a manner as possible. Run 
+
+=== PAGE 6 ===
+ 
+Version academic year 26/27 
+systematic experiments to compare the core and enhanced versions of the 
+ACTIVEA algorithm. Make notes to document your additional code and capture 
+your experimental insights. 
+8. Improve the ACTIVEA algorithm by enhancing its fitness function to cater to 
+exercise preferences from the seven exercise domains. Specifically, extend the 
+fitness function formula defined in core task 2 to penalise sessions that contain 
+activities that are not suitable for the intended preference, for example if the 
+intended focus is CV and FM, penalise activities that do not support  either CV 
+or FM. Think carefully about the implications this has on training and testing 
+data as well as on chromosome representation. Run systematic experiments to 
+compare the core and enhanced versions of the ACTIVEA algorithm. Make 
+notes to document your additional code and capture your experimental 
+insights. 
+9. Improve the ACTIVEA algorithm such that it recommends several exercise 
+sessions forming a daily, weekly, or monthly physical activity plan, depending 
+on user preferences (these need not be provided via an elaborate interface, 
+hardcoding them is acceptable). Run the advanced ACTIVEA algorithm and 
+record the experimental results. Make notes to document your additional code 
+and capture your experimental insights. 
+10. Continue core task 4 by selecting a second nature -inspired algorithm out of 
+those discussed in week 3, retrieving a publicly available implementation of 
+that algorithm and running it. Compare the results against those obtained in 
+task 4. Make notes capturi ng your experimental insights regarding the likely 
+causes of the differences between the physical activity  recommendations 
+produced by running this second nature-inspired algorithm and ACTIVEA.  
+11. Continue core task 6. Create a copy of the current ACTIVEA algorithm. Modify 
+the copy by adding one diversity preservation technique out of those discussed 
+in week 4, different to the one implemented in task 6. Run the modified copy 
+and compare the results against those obtained in task 6. Make notes to 
+document your additional code and capture your experimental insights. 
+ 
+ 
+Submission Instructions (When and Where do I submit?) 
+a. Format Your 1700 word ( ±10%) report should use  a legible 12pt font, single 
+spacing, and one of the standard referencing styles (Harvard, APA, Vancouver, 
+etc.). Although there are no strict formatting restrictions regarding the 
+presentation slides, aim to make them visually engaging, clear and concise 
+(i.e., avoid large blocks of text and complex animations, opting instead for easy-
+to-understand charts, diagrams and bullet point lists).   
+
+=== PAGE 7 ===
+ 
+Version academic year 26/27 
+b. Upload Go to your version of the DG4COM module on Blackboard (depending 
+on when you started your course, the module code will have a different ending). 
+In the Content tab, open the folder titled Assessment Area. In the Assessment 
+Submission subfolder: 
+• Click on the Codebase submission link to upload your code (.zip only, no 
+other archive types allowed). Follow the instructions on the webpage and 
+click Submit at the end. Do so before noon, on 6 Nov 2026. 
+• Click on the Report submission link to upload your report (.docx or .pdf only, 
+no other document formats allowed). If needed, refer to this guidance. 
+Follow the instructions on the webpage and click Submit at the end. Do so 
+before noon, on 6 Nov 2026. 
+• Click on the Presentation submission link to upload your presentation 
+slides (.ppt or .pdf) . Follow the instructions on the webpage and click 
+Submit at the end. Do so before noon, on 6 Nov 2026.  
+c. Mind the rules  
+• Submit the codebase, report and presentation in the allowed document 
+formats in order to have your work marked.  
+• Submit on time. A 5% penalty per day will be applied for late submissions; 
+submissions that are more than three days late (including weekends) will 
+receive a mark of 0.  
+Get support Make sensible and timely use of university resources. If you cannot 
+complete and submit your work on time because of exceptional circumstances, 
+apply for an extension 
+ 
+3.0 Purpose of Assessment 
+Link to Learning Outcomes (How does the assessment help you demonstrate the 
+outcomes of this module?)  
+Module Leaning Outcomes Assessment Aspects 
+LO1. Implement different 
+computational intelligence 
+techniques, evaluate their 
+performance and analyse the impact 
+of different problem representations 
+on the performance of those 
+techniques. 
+Code element 
+Experimental analysis sections in report 
+element 
+Demo in presentation 
+LO2. Judge and reason about 
+appropriate computational 
+intelligence techniques for a given 
+Critical analysis sections of report and 
+presentation elements 
+Code element 
+
+=== PAGE 8 ===
+ 
+Version academic year 26/27 
+problem and explain the 
+consequences of decisions. Use this 
+understanding to design novel 
+variants of computational intelligence 
+techniques for solving the problem. 
+LO3. Critically analyse recent 
+research in computational 
+intelligence. 
+Selection of alternative techniques to 
+compare own algorithm against in all 
+assessment elements 
+ 
+ 
+  
+Purpose of Assessment (Why am I doing this, and what knowledge, skills or 
+professional links should I demonstrate?) 
+ 
+Through this assessment you will be able to demonstrate the necessary skills to 
+design, implement and evaluate robust computational intelligence methods for 
+solving a real world problem, based on recent literature.  
+ 
+ 
+ 
+4.0 Feedback Expectations 
+When and where can I find my grades and feedback?  
+ 
+Formative Feedback 
+You will receive guidance on your code, report and presentation from your module 
+tutor throughout the module. In the face-to-face sessions, the tutor will work with you 
+to complete tasks that build skills relevant to your assessment, will give you feedback 
+on intermediate versions of your report and presentation, will answer your specific 
+queries and will signpost additional study resources. 
+Summative Feedback 
+You will receive comprehensive, bespoke written feedback on your code, report and 
+presentation, on Blackboard, by 4 December 2026.  
+Marks 
+Any grades that you see outside of My Aston Portal (MAP) should be thought of as 
+provisional. Only final Exam Board approved grades will appear in MAP. Follow this 
+guide to access your provisional grades and feedback on Blackboard. 
+ 
+ 
+
+=== PAGE 9 ===
+ 
+Version academic year 26/27 
+5.0 Guidance on AI Usage  
+Can I use AI in my work and how?  
+ 
+ 
+Use of Gen AI is Optional 
+ 
+[Example text] It is appropriate, but not essential, to make 
+constructive use of generative AI tools for this assignment. 
+[explain how and why] 
+ 
+This should not include using AI to create the content of the 
+assessment submission, but may, for example, include 
+generating initial ideas, summarising notes or research 
+articles, for translation, or creating a study plan. 
+Any application or use of AI should always be acknowledged.  
+ 
+Misuse of generative AI, as defined in Aston’s assessment 
+regulations, will be treated as an academic offence and may 
+be subject to disciplinary action. 
+ 
+You may find this guidance by The Learning Services team on 
+the effective and ethical use of AI for assessment useful: 
+Artificial Intelligence for study and assessment | Rise 360 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+6.0 Assessment Top Tips  
+What further information and advice might help me to complete this task? 
+ 
+• Acquire the essentials  of each module section by doing the prep . B uild your 
+knowledge and skillset by actively engaging with module activities throughout 
+taught sessions to efficiently grasp the concepts, methodologies and resources 
+covered. Consolidate your knowledge and skillset by doing the post -teaching 
+work on time. 
+• Read the assessment brief carefully, stick to the task described, follow the 
+rules and guidance and keep to the recommended timeline. 
+• Incorporate formative feedback received throughout the module  in your 
+coursework. This will help you make gradual, consistent progress.  
+• Ask the tutor for help with your queries as soon as you think of them.  
+• Develop your professional comms skills with help from the University’s  Library 
+and Learning Services on academic writing and giving effective presentations.   
+ 
+7.0 Assessment Criteria and Rubrics 
+What will my work be marked against?  
+
+
+=== PAGE 10 ===
+ 
+Version academic year 26/27 
+ 
+Codebase (20%) 
+Fail (0-39%) 
+The codebase does not compile or compiles but fails to 
+produce a solution. No or little original code was added to 
+the imported library. Some core tasks attempted, with 
+significant flaws (logical mistakes in implementation, 
+sloppy experimental work). 
+Borderline Fail (40 – 
+49%) 
+The codebase is functioning (runs and generates a result) 
+with minimal original code added to the imported library. 
+Most or all core tasks attempted, with significant flaws 
+(logical mistakes in implementation, sloppy experimental 
+work). 
+Pass (50 – 59%) 
+The codebase is functioning (runs and generates a result) 
+with significant original code added to the imported library. 
+Most or all core tasks attempted, with some flaws (logical 
+mistakes in implementation, subpar experimental work). 
+Merit (60 – 69%) 
+The codebase is functioning and computationally efficient 
+(takes up a reasonable amount of computational 
+resources to generate a high-quality result) with significant 
+original code added to the imported library. All core tasks 
+completed, with minor or no fl aws in implementation and 
+experimental work. 
+Distinction (70 – 79%) 
+The codebase is functioning and computationally efficient 
+(takes up a reasonable amount  of computational 
+resources to generate a high-quality result) with significant 
+original code added to the imported library. All core tasks 
+and one enhanced task completed, with minor or no flaws 
+in implementation and experimental work. 
+Distinction + (80-
+100%) 
+The codebase is functioning and computationally efficient 
+(takes up a reasonable amount  of computational 
+resources to generate a high-quality result) with significant 
+original code added to the imported library. All core tasks, 
+one enhanced task and one advanced task completed, 
+with minor or no flaws in implementation and experimental 
+work. 
+ 
+Report (30%) 
+Fail (0-39%) 
+The report is mostly descriptive, with few or no elements of 
+critical analysis. The argument is unconvincing, is 
+supported by insufficient or no evidence, and lacks the 
+
+=== PAGE 11 ===
+ 
+Version academic year 26/27 
+appropriate depth. The writing has major defects: regular 
+errors of English, substantial repetition and/or irrelevance, 
+significant gaps in the rationale leading to flawed 
+conclusions, poor structure, and a standard of 
+presentation (e.g., layout, fonts, he adings, figures, 
+references) that actively detracts from understanding the 
+message being conveyed. 
+Borderline Fail (40 – 
+49%) 
+The report is mostly descriptive, with some elements of 
+critical analysis. There is an attempt at reflecting on the 
+algorithm’s implementation and on the experimental work, 
+yet the conclusions being drawn fail to coalesce into a 
+meaningful take -away messag e. The writing has some 
+defects that do not detract from understanding the 
+message being conveyed. 
+Pass (50 – 59%) 
+There is a good balance between the descriptive and the 
+analytical/reflective elements of the report. The arguments 
+made are clearly articulated and accompanied by 
+adequate evidence. The report is clearly structured and 
+makes effective use of figures and o ther supporting 
+artefacts. Any writing defects are minor. 
+Merit (60 – 69%) 
+There is a good balance between the descriptive and the 
+analytical/reflective elements of the report. The arguments 
+made are clearly articulated and accompanied by 
+extensive evidence. The report is clearly structured and 
+makes effective use of diagrams and  other supporting 
+artefacts. Any writing defects are minor. 
+Distinction (70 – 79%) 
+There is a remarkably well-calibrated balance between the 
+descriptive and the analytical/reflective elements of the 
+report. The arguments made are clear, concise, and 
+accompanied by particularly significant evidence, which 
+has been carefully selected from an extensive body of 
+literature. The report is structured in a highly intuitive 
+manner and makes effective use of diagrams and other 
+supporting artefacts. Any writing defects are very minor. 
+Distinction + (80-
+100%) 
+There is a remarkably well-calibrated balance between the 
+descriptive and the analytical/reflective elements of the 
+report. The arguments made are clear, concise, and feature 
+elements of innovation. The narrative draws from an 
+extensive and diverse pool of  particularly significant 
+evidence. The report is structured in a highly intuitive 
+
+=== PAGE 12 ===
+ 
+Version academic year 26/27 
+manner and makes excellent use of diagrams and other 
+supporting artefacts. Any writing defects are very minor. 
+ 
+Presentation (50%) 
+Fail (0-49%) 
+The presentation is superficial, incomplete, and delivered 
+in a hesitant, unconvincing, and/or incoherent manner.  
+The student could not answer questions about the 
+presentation. 
+Borderline Fail (40 – 
+49%) 
+The presentation and answers to questions provide limited 
+insight, are incomplete, and delivered in a hesitant, 
+unconvincing, and/or incoherent manner. 
+Pass (50 – 59%) 
+The presentation and answers to questions demonstrate  
+an adequate level of insight, are complete, and delivered in 
+a confident, convincing, and coherent manner. 
+Merit (60 – 69%) 
+The presentation and answers to questions provide 
+substantial insight, are complete, and delivered in a 
+confident, convincing, and coherent manner. 
+Distinction (70 – 79%) 
+The presentation and questions provide substantial 
+insight, demonstrate a remarkable level of critical analysis, 
+are complete, and delivered in a confident, convincing, and 
+coherent manner. 
+Distinction + (80-
+100%) 
+The presentation and answers to questions are  elegant, 
+provide substantial insight, demonstrate a remarkable 
+level of critical analysis, are complete and delivered in a 
+confident, convincing, and coherent manner that can be 
+described as highly engaging, innovative, and/or 
+illuminating. 
+ 
+ 
+ 
+ 
+ 
+

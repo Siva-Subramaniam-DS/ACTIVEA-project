@@ -1,0 +1,217 @@
+[0] (Style: normal, Words: 11)
+ACTIVEA: Optimization and Analysis of Single-Session Exercise Planning Using Genetic Algorithms
+
+[1] (Style: normal, Words: 0)
+
+
+[2] (Style: normal, Words: 0)
+
+
+[3] (Style: normal, Words: 0)
+
+
+[4] (Style: normal, Words: 7)
+Module Code and Title: DG4COM Computational Intelligence
+
+[5] (Style: normal, Words: 6)
+Module/Assessment Lead: Prof Aniko Ekart (a.ekart@aston.ac.uk)
+
+[6] (Style: normal, Words: 5)
+Student Name: Siva Subramaniam Raju
+
+[7] (Style: normal, Words: 3)
+Student No: 260322784
+
+[8] (Style: normal, Words: 3)
+Submission Date: [Blank]
+
+[9] (Style: normal, Words: 11)
+Individual Technical Assessment Report - Department of Computer Science, Aston University
+
+[10] (Style: Heading 1, Words: 5)
+1. Introduction and System Overview
+
+[11] (Style: normal, Words: 109)
+The ACTIVEA framework addresses the complex combinatorial problem of synthesizing optimal single-session exercise regimens tailored to individual physiological profiles and multi-objective training targets. Formally, a single exercise session is modeled as a structured sequence of discrete physical activities selected from a predefined catalog, where each activity is allocated a specific continuous or discrete time duration measured in minutes. The optimization objective requires balancing metabolic expenditure-quantified via total caloric burn-against a multidimensional vector of exercise-intensity constraints specified by the course assignment brief. These intensity metrics encompass Metabolic Equivalent of Task (MET), Target Rating of Perceived Exertion (RPE), and heart rate response operationalized as a percentage of maximum heart rate (%HRmax).
+
+[12] (Style: normal, Words: 107)
+In addition to numerical bioenergetic and physiological bounds, ACTIVEA requires robust coverage across key functional exercise science domains. These training domains represent distinct qualitative physiological adaptations and fitness capacities: cardiovascular endurance, absolute and relative strength, muscular endurance, flexibility, postural balance, agility, and functional movement patterns. The primary challenge stems from the conflicting and non-linear interactions between duration, metabolic rate, and subjective strain. A prolonged low-intensity routine may satisfy caloric targets while failing minimum MET thresholds, whereas high-intensity interval routines risk exceeding upper physiological bounds or neglecting targeted functional movement categories. Consequently, metaheuristic global search techniques-specifically generational Genetic Algorithms (GAs)-are deployed to traverse the non-convex decision space efficiently.
+
+[13] (Style: Heading 1, Words: 7)
+2. Physiological Domain Modeling and Activity Characterization
+
+[14] (Style: normal, Words: 113)
+The foundational dataset governing the search landscape originates from established exercise physiology literature and the coursework brief specifications. The initial baseline entry defines moderate jogging as burning 7.35 kcal per minute for a normalized 70 kg reference adult, exhibiting a MET value of 6.0, an RPE of 5.0 (on the Borg 1–10 scale), a target heart-rate band spanning 70% to 77% of HRmax, and contributing directly to cardiovascular fitness, muscular endurance, and functional movement. To construct a comprehensive search space, nine additional standardized activities were incorporated from empirical exercise science sources: bodyweight squats, moderate cycling, static plank holds, hatha yoga, high-intensity rope skipping, outdoor running, brisk walking, calisthenics/push-ups, and agility drills incorporating burpees.
+
+[15] (Style: normal, Words: 47)
+Because energy expenditure varies dynamically with individual body mass, the baseline caloric expenditure rates for a standard 70 kg individual must be dynamically rescaled during session evaluation. Mass scaling obeys a linear proportional model derived from fundamental bioenergetic principles of oxygen consumption per unit mass, defined by:
+
+[16] (Style: normal, Words: 14)
+Caloric Rate (user) = Caloric Rate (70kg) × ( Body Mass / 70 )
+
+[17] (Style: normal, Words: 133)
+Total session caloric expenditure represents the cumulative sum of individual activity durations multiplied by their respective body-mass-adjusted rates. Auxiliary biometric parameters such as ideal target mass or Body Mass Index (BMI) are deliberately excluded from primary caloric summation formulas, as the brief provides no mechanistic physiological equations linking BMI variations directly to baseline MET expenditure without altering underlying oxygen consumption models. For example, a 70 kg individual undertaking 12 minutes of yoga (3.0 kcal/min) and 13 minutes of rope skipping (11.0 kcal/min) burns precisely 36.0 kcal and 142.0 kcal respectively, yielding an aggregate session expenditure of 178.0 kcal. Mass-adjusted variations preserve these relative proportion ratios across different athlete profiles. Furthermore, the domain catalog mapping integrates explicit qualitative metabolic demands, ensuring that aerobic and anaerobic energy systems are systematically represented across candidate exercise selections.
+
+[18] (Style: Heading 1, Words: 7)
+3. Genetic Algorithm Architecture and Chromosomal Representation
+
+[19] (Style: normal, Words: 87)
+To encode potential exercise sessions into evolutionary structures, a variable-length candidate list representation is employed. A single chromosome consists of an ordered array of tuples, where each tuple represents an (Activity_ID, Duration) pair. Structural validity constraints stipulate that a viable session must contain between two and five distinct activities, with individual activity durations bounded within [5, 45] minutes. To prevent illegal redundant structures, duplicate activity occurrences within a single chromosome are automatically merged by summing their durations and applying clamping operators to enforce the upper 45-minute bound.
+
+[20] (Style: normal, Words: 110)
+The evolutionary architecture utilizes a canonical generational Genetic Algorithm pipeline. An initial candidate population is randomly instantiated across the valid search domain. At each generation, individual fitness scores are evaluated using the baseline lecture fitness rules prior to parental selection. Selection employs tournament selection with a tournament size of k = 3, balancing selection pressure against premature convergence risks. Two-parent recombination occurs at a crossover probability of P_c = 0.8. The crossover operator pools activity tuples from both parents; identical activity types undergo duration consolidation before splitting elements into two offspring chromosomes. This recombination process allows structural sub-routines (such as paired cardiovascular activities) to be inherited intact by subsequent generations.
+
+[21] (Style: normal, Words: 104)
+Offspring undergo stochastic mutation at a per-chromosome probability of P_m = 0.15. The mutation operator randomly executes one of four localized variation mechanisms: (1) perturbation of an existing duration by ±1 to ±5 minutes, (2) substitution of an existing activity with an unrepresented catalog exercise, (3) insertion of a new activity tuple (if session length < 5), or (4) deletion of an activity tuple (if session length > 2). Elite preservation is enforced by copying the two best distinct chromosomes intact to the subsequent generation. Algorithm execution terminates upon reaching a fixed generation limit, returning the best scoring chromosome evaluated throughout the search trajectory.
+
+[22] (Style: Heading 1, Words: 7)
+4. Fitness Evaluation Mechanics and Constraint Handling
+
+[23] (Style: normal, Words: 51)
+The primary fitness evaluation function strictly replicates the step-wise step-penalty rules established in the taught lecture code, rather than continuous scalar metrics out of 100. Starting from a baseline score of zero, the function applies four independent physiological checks, assigning +1 point for meeting target thresholds and -1 point for violations:
+
+[24] (Style: normal, Words: 18)
+Caloric Range Check: Session total calories must lie strictly within [300, 600] kcal (+1 if valid, -1 otherwise).
+
+[25] (Style: normal, Words: 16)
+Weighted MET Threshold: Duration-weighted average MET score must be ≥ 4.0 (+1 if valid, -1 otherwise).
+
+[26] (Style: normal, Words: 16)
+Weighted RPE Band: Duration-weighted average RPE must lie within [4.0, 7.0] (+1 if valid, -1 otherwise).
+
+[27] (Style: normal, Words: 16)
+Weighted Heart Rate Band: Duration-weighted %HRmax must lie within [64%, 80%] (+1 if valid, -1 otherwise).
+
+[28] (Style: normal, Words: 17)
+Consequently, the resulting raw fitness score is an integer discrete scalar restricted to the domain [-4, +4].
+
+[29] (Style: normal, Words: 144)
+To support specialized user goals, three refined caloric targets are integrated: General Health ([200, 400] kcal), Fitness Improvement ([300, 500] kcal), and Weight Loss ([400, 600] kcal). When evaluating user-customized runs, the caloric check adjusts its upper and lower bounds to match the selected target band while preserving the baseline MET, RPE, and heart rate thresholds. Functional domain coverage tracking operates as an auxiliary diagnostic overlay; domain labels are logged to inform users of qualitative adaptation attributes, but they exert no mathematical influence on the raw +4 lecture fitness score. This separation highlights a fundamental trade-off: a candidate session can achieve a maximum score of +4 while entirely failing to include specific exercise domains such as heavy strength training or flexibility work. To mitigate this limitation, constraint violation metrics are computed alongside raw fitness values to provide detailed analytical insights during post-hoc session auditing.
+
+[30] (Style: Heading 1, Words: 7)
+5. Experimental Optimization Results and Empirical Analysis
+
+[31] (Style: normal, Words: 104)
+Applying the baseline GA framework to a standard 70 kg profile yields a top-tier core session consisting of rope skipping (31 min), bodyweight squats (9 min), and yoga (21 min), totaling 61 minutes. Aggregate energy expenditure reaches 448.1 kcal (341.0 + 44.1 + 63.0 kcal). Duration-weighted intensity metrics are evaluated at 6.02 MET, 5.98 RPE, and 72.7% HRmax. Because all four checks fall within prescribed boundaries, the solution achieves the theoretical maximum lecture fitness score of +4. Furthermore, this session successfully achieves complete coverage across all seven physiological exercise domains without explicit numerical optimization pressure, demonstrating the structural versatility of the evolutionary search space.
+
+[32] (Style: normal, Words: 122)
+Re-evaluating the algorithm with a population of N = 40 across 40 generations (random seed 42) demonstrates rapid convergence, reaching the +4 fitness ceiling within the initial generation. Because the discrete step-penalty function creates a broad plateau of equivalent optima, search trajectories cannot differentiate between solutions once the +4 boundary is reached. For instance, the seed 42 run produced an alternative optimal session: bodyweight squats (13 min), jogging (21 min), yoga (20 min), and agility drills (23 min), totaling 77 minutes and 503.5 kcal. Despite exhibiting distinct temporal and caloric structures (77 min / 503.5 kcal vs. 61 min / 448.1 kcal), both candidate routines receive identical fitness valuations of +4, exposing the coarse granularity of step-penalty fitness functions in evolutionary search.
+
+[33] (Style: Heading 1, Words: 8)
+6. Comparative Evaluation: Genetic Algorithm vs. Simulated Annealing
+
+[34] (Style: normal, Words: 124)
+To benchmark the GA against alternative metaheuristics, a Simulated Annealing (SA) trajectory search was implemented using an identical evaluation function and seed initialization. SA maintains a single candidate solution, accepting inferior neighbor solutions probabilistically according to the Metropolis criterion controlled by a decaying temperature parameter T. Under seed 42, SA successfully navigated to a +4 fitness solution. However, structural trajectory differences emerge upon analyzing continuous fitness mapped landscapes (as illustrated in Figure 1). GA crossover operations facilitate macro-level leaps across search space by recombining structural blocks (e.g., merging cardiovascular routines with flexibility segments in a single generation), whereas SA relies on incremental local mutations. On discrete step-penalty landscapes, both methods reach peak performance scores, but GA exhibits faster convergence speed under complex multi-domain constraints.
+
+[35] (Style: Heading 1, Words: 6)
+7. Hyperparameter Dynamics and Population Diversity
+
+[36] (Style: normal, Words: 69)
+Systematic hyperparameter sensitivity studies evaluating population size N ∈ {10, 20, 40, 80}, crossover rates P_c ∈ [0.5, 0.95], and mutation rates P_m ∈ [0.01, 0.3] confirmed that under coarse step-penalty rules, quantitative algorithm ranking remains degenerate. All non-trivial parameter configurations achieve +4 within minimal generation counts, concealing underlying convergence characteristics. This behavior underscores the necessity of continuous surrogate evaluators when fine-tuning evolutionary parameters for complex multi-objective fitness landscapes.
+
+[37] (Style: normal, Words: 100)
+To prevent premature genetic drift and maintain exploration diversity, a Deterministic Crowding (DC) variant was integrated. In DC, offspring compete directly against their most structurally similar parent based on Euclidean gene distance, preserving niche sub-populations. Over a 20-generation trial (N = 40, seed 42), phenotypic diversity in standard GA drifted from an initial value of 36.9 to 57.2 due to uncontrolled crossover dispersion across equal-fitness plateaus, whereas the Deterministic Crowding GA maintained controlled diversity trajectory bounds (36.9 to 39.7, as visually recorded in Figure 2). Both algorithms maintained maximum fitness output, but DC successfully preserved diverse, multi-modal exercise session options.
+
+[38] (Style: Heading 1, Words: 8)
+8. Bespoke Repair Operators and Domain Preference Penalties
+
+[39] (Style: normal, Words: 79)
+To overcome low optimization efficiency caused by random boundary violations, a specialized Domain and Caloric Repair Operator was introduced into the variation pipeline. Prior to fitness evaluation, offspring chromosomes undergo deterministic adjustment: if cumulative caloric burn falls below target bounds, duration values are scaled upwards or an additional activity is inserted from the database. Conversely, over-budget routines undergo duration pruning. As shown in Figure 3, the repair operator significantly accelerates convergence trajectory speeds compared to standard random search GA.
+
+[40] (Style: normal, Words: 113)
+Furthermore, user-defined functional domain preferences were incorporated by modifying the core fitness evaluation function. When specific target domains are requested (e.g., Cardiovascular and Functional Movement), candidate sessions containing non-contributing activities incur explicit mathematical fitness penalties. Under preference-guided optimization, a cardiovascular-focused trial produced agility drills (25 min), running (13 min), and yoga (25 min), yielding 456.5 kcal over 63 minutes (5.92 MET, 5.81 RPE, 74.3% HRmax) while fully satisfying target preference criteria. Similarly, a Strength and Muscular Endurance run synthesized moderate cycling (22 min), rope skipping (12 min), jogging (19 min), and plank holds (7 min) totaling 445.8 kcal. The domain preference penalty successfully prevents the search engine from omitting requested functional exercise modalities.
+
+[41] (Style: Heading 1, Words: 6)
+9. Comparative Analysis across Search Paradigms
+
+[42] (Style: normal, Words: 101)
+A unified benchmark trial evaluating eight search paradigms (Particle Swarm Optimization, Bespoke Repair GA, Differential Evolution, Simulated Annealing, (1+1) Evolution Strategy, Iterated Local Search, Standard GA, Deterministic Crowding GA, and Random Search) across 30 independent seeds (2,500 evaluation budget) is summarized in Figures 4 and 5. Algorithms mapped onto continuous 0–100 fitness representations demonstrate clear differentiation: Bespoke Repair GA and Differential Evolution achieve superior convergence stability, whereas unconstrained local searches display higher sensitivity to initial seed conditions. Statistical hypothesis testing confirms that population-based metaheuristics maintain significantly lower variance in final solution quality across varied initialization seeds compared to single-point search trajectories.
+
+[43] (Style: normal, Words: 0)
+
+
+[44] (Style: normal, Words: 45)
+10. AI and Manual Content Declaration.
+Initial text drafting and structural formatting suggestions were assisted by generative AI (Cursor / Gemini). All core empirical data, algorithmic implementations, experimental script execution, physiological mathematical models, and analytical interpretations were independently developed, validated, and authored by the student.
+
+[45] (Style: normal, Words: 0)
+
+
+[46] (Style: normal, Words: 2)
+11. Charts
+
+[47] (Style: normal, Words: 0)
+
+
+[48] (Style: normal, Words: 11)
+Figure 1. Best fitness for the genetic algorithm and simulated annealing.
+
+[49] (Style: normal, Words: 0)
+
+
+[50] (Style: normal, Words: 9)
+Figure 2. Population diversity with and without deterministic crowding.
+
+[51] (Style: normal, Words: 0)
+
+
+[52] (Style: normal, Words: 10)
+Figure 3. The plain genetic algorithm and the repair operator.
+
+[53] (Style: normal, Words: 0)
+
+
+[54] (Style: normal, Words: 12)
+Figure 4. Mean convergence of the search methods on the same budget.
+
+[55] (Style: normal, Words: 0)
+
+
+[56] (Style: normal, Words: 12)
+Figure 5. Convergence when sessions are scored with the saved calorie model.
+
+[57] (Style: normal, Words: 0)
+
+
+[58] (Style: normal, Words: 0)
+
+
+[59] (Style: normal, Words: 0)
+
+
+[60] (Style: normal, Words: 0)
+
+
+[61] (Style: normal, Words: 1)
+References
+
+[62] (Style: normal, Words: 31)
+Jette, M., Sidney, K. and Blumchen, G. (1990) Metabolic equivalents (METS) in exercise testing, exercise prescription, and evaluation of functional capacity. Clinical Cardiology, 13(8), pp. 555-565. Cited in the coursework brief.
+
+[63] (Style: normal, Words: 12)
+Aston University (2026) DG4COM Computational Intelligence, coursework brief ACTIVEA. Birmingham: Aston University.
+
+[64] (Style: normal, Words: 13)
+Aston University (2024) Evolutionary Algorithms Knowledge Acquisition, lecture slides, DG4COM. Birmingham: Aston University.
+
+[65] (Style: normal, Words: 11)
+Aston University (2024) Local Search, lecture slides, DG4COM. Birmingham: Aston University.
+
+[66] (Style: normal, Words: 11)
+Aston University (2024) Parameter Management, lecture slides, DG4COM. Birmingham: Aston University.
+
+[67] (Style: normal, Words: 0)
+
+
+[68] (Style: normal, Words: 0)
+
+
+[69] (Style: normal, Words: 0)
+
+
+[70] (Style: normal, Words: 0)
+
+
+[71] (Style: normal, Words: 4)
+Dataset Link : endomondoHR
+

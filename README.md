@@ -2,6 +2,25 @@
 
 Physical activity planning for DG4COM Computational Intelligence at Aston University.
 
+## Quick Start Guide
+
+Install dependencies and launch the unified menu:
+
+```bash
+pip install -r requirements.txt
+python main.py
+```
+
+### Direct Command-Line Shortcuts
+
+- **Interactive Presentation Demo**: `python main.py --demo` (or `python demo.py 1`)
+- **Quick 7-Algorithm ML Benchmark**: `python main.py --quick`
+- **Full Scientific ML Benchmark**: `python main.py --benchmark`
+- **Web Session Planner**: `python main.py --web` (starts on `http://127.0.0.1:8767`)
+- **Run Complete Unit Tests**: `python -m unittest tests/test_all.py` (or `python main.py --test`)
+
+---
+
 ACTIVEA searches for one exercise session. A session is a short list of activities, each with a duration in minutes. The search is a generational genetic algorithm. A session is scored with the lecture checks, and its calories come from the coursework activity table scaled to the person's body mass.
 
 ## What a session is
