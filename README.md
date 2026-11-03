@@ -89,7 +89,7 @@ pip install numpy pandas scikit-learn joblib matplotlib
 
 ### Planner page
 
-Open `web/index.html` in a browser. Enter body mass, choose a goal, and press **Plan this session**. The page runs the genetic algorithm in the browser and plays the session at one planned minute per second.
+Open `web/index.html` in a browser. Enter body mass or choose a goal. The page rebuilds the session and plays it at one planned minute per second.
 
 `python main.py --web` also serves that page at <http://127.0.0.1:8767/>.
 

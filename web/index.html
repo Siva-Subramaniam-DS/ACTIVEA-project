@@ -92,19 +92,7 @@
     background: #2a1c18;
   }
   .goals small { display: block; color: var(--muted); margin-left: 24px; }
-  button {
-    width: 100%;
-    border: 0;
-    border-radius: 12px;
-    background: var(--green);
-    color: white;
-    font-size: 16px;
-    padding: 12px 14px;
-    cursor: pointer;
-    font-weight: 650;
-  }
-  button:hover { background: var(--green-dark); }
-  button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid #ffb199; outline-offset: 2px; }
+  input:focus-visible, select:focus-visible { outline: 3px solid #ffb199; outline-offset: 2px; }
   .status { min-height: 1.2em; color: var(--muted); font-size: 13px; margin-top: 10px; }
   .score-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; }
   .score {
@@ -164,6 +152,12 @@
   .track { height: 8px; background: #121826; border-radius: 99px; overflow: hidden; }
   .fill { height: 100%; background: linear-gradient(90deg, var(--mint), var(--green)); width: 0; }
   .domains { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+  .key { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 8px; color: var(--muted); font-size: 12px; }
+  .legend { display: flex; gap: 18px; margin-top: 10px; color: var(--muted); font-size: 13px; }
+  .swatch { display: inline-block; width: 18px; height: 3px; margin-right: 6px; vertical-align: middle; border-radius: 2px; }
+  .swatch.best { background: #ff6b3d; }
+  .swatch.mean { background: #5c6b82; }
+  .hint { color: var(--muted); font-size: 13px; margin: 8px 0 0; }
   .dom {
     width: 42px;
     text-align: center;
@@ -188,7 +182,7 @@
 <header>
   <div class="kicker">Live session</div>
   <h1>ACTIVEA</h1>
-  <p class="lede">Your next workout, built for your weight, age and goal. Press plan, then follow the block that is on now.</p>
+  <p class="lede">Your next workout, built for your weight and goal. Follow the block that is on now.</p>
   <div class="clock" id="wall">--:--:--</div>
 </header>
 <main>
@@ -224,12 +218,24 @@
       <div class="field">
         <span class="kicker">Goal band</span>
         <div class="goals">
-          <label><input type="radio" name="goal" value="general_health"> General health <small>200–400 kcal · lighter mixed work</small></label>
-          <label><input type="radio" name="goal" value="fitness_improvement" checked> Fitness improvement <small>300–500 kcal · moderate cardio and strength</small></label>
-          <label><input type="radio" name="goal" value="weight_loss"> Weight loss <small>400–600 kcal · vigorous mixed work</small></label>
+          <label><input type="radio" name="goal" value="general_health"> General health <small>200–400 kcal</small></label>
+          <label><input type="radio" name="goal" value="fitness_improvement" checked> Fitness improvement <small>300–500 kcal</small></label>
+          <label><input type="radio" name="goal" value="weight_loss"> Weight loss <small>400–600 kcal</small></label>
         </div>
       </div>
-      <button type="submit">Plan this session</button>
+      <div class="field">
+        <label for="focus">Athletic domain focus</label>
+        <select id="focus">
+          <option value="all" selected>Balanced Fitness Mix (All 7 Domains)</option>
+          <option value="CV">Cardiovascular Fitness Focus (CV)</option>
+          <option value="ST">Strength Development Focus (ST)</option>
+          <option value="ME">Muscular Endurance Focus (ME)</option>
+          <option value="FL">Flexibility / Mobility Focus (FL)</option>
+          <option value="BA">Balance &amp; Stability Focus (BA)</option>
+          <option value="AG">Agility Training Focus (AG)</option>
+          <option value="FM">Functional Movement Focus (FM)</option>
+        </select>
+      </div>
       <div class="status" id="status">Planning with the lecture checks.</div>
     </form>
 
@@ -253,6 +259,8 @@
       <div class="session" id="session"></div>
       <div class="bars" id="bars"></div>
       <div class="domains" id="domains"></div>
+      <div class="key" id="domain-key"></div>
+      <p class="hint">This list is the chosen session, 2 to 5 activities. Change a number and the plan is built again. Calories follow the body mass you type.</p>
     </section>
   </div>
 
@@ -261,6 +269,10 @@
       <div class="kicker">This plan</div>
       <h2 style="font-weight:650;margin:4px 0 8px;">How the plan improved</h2>
       <canvas id="chart" width="800" height="240"></canvas>
+      <div class="legend">
+        <span><i class="swatch best"></i>Best score</span>
+        <span><i class="swatch mean"></i>Population average</span>
+      </div>
     </section>
   </div>
 </main>
@@ -282,6 +294,15 @@ const POOL = [
   { name: "Agility drills & Burpees", kcal70: 9.80, met: 8.0, rpe: 8.0, hr: 85.0, domains: ["CV", "AG", "ST", "FM"] }
 ];
 const ALL_DOMAINS = ["CV", "ST", "ME", "FL", "BA", "AG", "FM"];
+const DOMAIN_NAMES = {
+  CV: "Cardiovascular",
+  ST: "Strength",
+  ME: "Muscular endurance",
+  FL: "Flexibility",
+  BA: "Balance",
+  AG: "Agility",
+  FM: "Functional movement"
+};
 const PHOTOS = {
   "Jogging": "images/jog.jpg",
   "Running": "images/jog.jpg",
@@ -299,9 +320,9 @@ function photoFor(name) {
 }
 let liveTimer = null;
 const GOALS = {
-  general_health: { cal: [200, 400], met: [3.0, 6.0], rpe: [3.0, 6.0], hr: [55, 75] },
-  fitness_improvement: { cal: [300, 500], met: [4.5, 7.5], rpe: [4.0, 7.0], hr: [64, 80] },
-  weight_loss: { cal: [400, 600], met: [5.5, 9.0], rpe: [5.0, 8.5], hr: [70, 88] }
+  general_health: { cal: [200, 400], domains: ["CV", "ME", "FL", "BA", "FM"] },
+  fitness_improvement: { cal: [300, 500], domains: ["CV", "ST", "ME", "BA", "AG", "FM"] },
+  weight_loss: { cal: [400, 600], domains: ["CV", "ST", "ME", "FL", "BA", "AG", "FM"] }
 };
 
 function makeRng(seed) {
@@ -350,7 +371,7 @@ function checkScore(pass) {
 function evaluateSession(session, weight, goal) {
   const minutes = session.reduce((sum, gene) => sum + gene.duration, 0);
   if (minutes <= 0 || session.length === 0) {
-    return { fitness: -4, kcal: 0, minutes: 0, met: 0, rpe: 0, hr: 0, domains: [], parts: {}, blockKcal: [] };
+    return { fitness: -4, kcal: 0, minutes: 0, met: 0, rpe: 0, hr: 0, domains: [], goalCovered: [], goalTotal: (goal.domains || ALL_DOMAINS).length, focusMinutes: 0, parts: {}, blockKcal: [] };
   }
   const calories = session.map(gene => blockKcal(gene, weight));
   const kcal = calories.reduce((sum, value) => sum + value, 0);
@@ -358,6 +379,11 @@ function evaluateSession(session, weight, goal) {
   const rpe = session.reduce((sum, gene) => sum + gene.activity.rpe * gene.duration, 0) / minutes;
   const hr = session.reduce((sum, gene) => sum + gene.activity.hr * gene.duration, 0) / minutes;
   const domains = [...new Set(session.flatMap(gene => gene.activity.domains))];
+  const wanted = goal.domains || ALL_DOMAINS;
+  const goalCovered = wanted.filter(domain => domains.includes(domain));
+  const focusMinutes = !goal.focus || goal.focus === "all"
+    ? 0
+    : session.reduce((sum, gene) => sum + (gene.activity.domains.includes(goal.focus) ? gene.duration : 0), 0);
   const parts = {
     cal: checkScore(kcal >= goal.cal[0] && kcal <= goal.cal[1]),
     met: checkScore(met >= 4.0),
@@ -365,7 +391,7 @@ function evaluateSession(session, weight, goal) {
     hr: checkScore(hr >= 64.0 && hr <= 80.0)
   };
   const fitness = parts.cal + parts.met + parts.rpe + parts.hr;
-  return { fitness, kcal, minutes, met, rpe, hr, domains, parts, blockKcal: calories };
+  return { fitness, kcal, minutes, met, rpe, hr, domains, goalCovered, goalTotal: wanted.length, focusMinutes, parts, blockKcal: calories };
 }
 
 function scoreAll(population, weight, goal) {
@@ -376,8 +402,27 @@ function scoreAll(population, weight, goal) {
    Tournament k = 3. Elitism E = 2 (Goldberg, 1989).
    Recombination sums a repeated activity, then partitions the set.
    Mutation probability 0.15 on duration, substitution, insert, and delete. */
-function evolve(profile, goal, onStep) {
-  const rng = makeRng(42);
+function profileSeed(profile, goalName) {
+  const text = [
+    profile.weight.toFixed(1),
+    profile.dream.toFixed(1),
+    profile.bmi.toFixed(1),
+    String(profile.age),
+    String(profile.resting),
+    profile.gender,
+    goalName,
+    profile.focus || "all"
+  ].join("|");
+  let seed = 2166136261;
+  for (let i = 0; i < text.length; i++) {
+    seed ^= text.charCodeAt(i);
+    seed = Math.imul(seed, 16777619);
+  }
+  return seed >>> 0;
+}
+
+function evolve(profile, goal, seed) {
+  const rng = makeRng(seed);
   const popSize = 40;
   const generations = 40;
   const crossoverRate = 0.8;
@@ -443,32 +488,64 @@ function evolve(profile, goal, onStep) {
       const available = POOL.filter(activity => !used.has(activity));
       if (available.length) genes[rng.int(0, genes.length - 1)].activity = rng.pick(available);
     }
-    if (genes.length < 5 && rng.next() < mutationRate) {
-      const used = new Set(genes.map(gene => gene.activity));
-      const available = POOL.filter(activity => !used.has(activity));
-      if (available.length) genes.push({ activity: rng.pick(available), duration: clip(8 + rng.next() * 12) });
-    }
+    if (genes.length < 5 && rng.next() < 0.6) addMissingDomain(genes);
     if (genes.length > 2 && rng.next() < mutationRate) genes.splice(rng.int(0, genes.length - 1), 1);
     return repair(genes, individual);
   }
-  function tournament(population, fitness) {
+  function goalHits(row) {
+    const wanted = goal.domains || ALL_DOMAINS;
+    return wanted.filter(domain => row.domains.includes(domain)).length;
+  }
+  function domainGain(activity, genes) {
+    const covered = new Set(genes.flatMap(gene => gene.activity.domains));
+    const wanted = new Set(goal.domains || ALL_DOMAINS);
+    return activity.domains.filter(domain => wanted.has(domain) && !covered.has(domain)).length;
+  }
+  function addMissingDomain(genes) {
+    if (genes.length >= 5) return;
+    const used = new Set(genes.map(gene => gene.activity));
+    const available = POOL.filter(activity => !used.has(activity));
+    if (!available.length) return;
+    const bestGain = Math.max(...available.map(activity => domainGain(activity, genes)));
+    if (bestGain <= 0) return;
+    const choices = available.filter(activity => domainGain(activity, genes) === bestGain);
+    genes.push({ activity: rng.pick(choices), duration: clip(8 + rng.next() * 12) });
+  }
+  function beats(candidate, incumbent) {
+    if (candidate.fitness !== incumbent.fitness) return candidate.fitness > incumbent.fitness;
+    if ((candidate.focusMinutes || 0) !== (incumbent.focusMinutes || 0)) {
+      return (candidate.focusMinutes || 0) > (incumbent.focusMinutes || 0);
+    }
+    return goalHits(candidate) > goalHits(incumbent);
+  }
+  function tournament(population, scored) {
     const contenders = rng.sample(population.map((_, index) => index), 3);
     let best = contenders[0];
-    contenders.forEach(index => { if (fitness[index] > fitness[best]) best = index; });
+    contenders.forEach(index => { if (beats(scored[index], scored[best])) best = index; });
     return population[best];
   }
 
   let population = Array.from({ length: popSize }, fresh);
   let scored = scoreAll(population, profile.weight, goal);
   let fitness = scored.map(row => row.fitness);
-  let bestIndex = fitness.indexOf(Math.max(...fitness));
-  let best = population[bestIndex].map(gene => ({ ...gene }));
-  let bestFitness = fitness[bestIndex];
-  let bestResult = scored[bestIndex];
+  let best = population[0].map(gene => ({ ...gene }));
+  let bestResult = scored[0];
+  scored.forEach((row, index) => {
+    if (beats(row, bestResult)) {
+      best = population[index].map(gene => ({ ...gene }));
+      bestResult = row;
+    }
+  });
+  let bestFitness = bestResult.fitness;
   const history = [{ generation: 0, best: bestFitness, mean: fitness.reduce((s, v) => s + v, 0) / fitness.length }];
 
   for (let generation = 1; generation <= generations; generation++) {
-    const ranked = fitness.map((value, index) => ({ value, index })).sort((a, b) => b.value - a.value);
+    const ranked = scored.map((row, index) => ({
+      index,
+      fitness: row.fitness,
+      focusMinutes: row.focusMinutes || 0,
+      domains: goalHits(row)
+    })).sort((a, b) => b.fitness - a.fitness || b.focusMinutes - a.focusMinutes || b.domains - a.domains);
     const elites = [];
     const seen = new Set();
     ranked.forEach(item => {
@@ -480,25 +557,25 @@ function evolve(profile, goal, onStep) {
     });
     const offspring = [];
     while (offspring.length < popSize - elites.length) {
-      const [childA, childB] = crossover(tournament(population, fitness), tournament(population, fitness));
+      const [childA, childB] = crossover(tournament(population, scored), tournament(population, scored));
       offspring.push(mutate(childA));
       if (offspring.length < popSize - elites.length) offspring.push(mutate(childB));
     }
     population = elites.concat(offspring);
     scored = scoreAll(population, profile.weight, goal);
     fitness = scored.map(row => row.fitness);
-    const current = fitness.indexOf(Math.max(...fitness));
-    if (fitness[current] > bestFitness) {
-      bestFitness = fitness[current];
-      best = population[current].map(gene => ({ ...gene }));
-      bestResult = scored[current];
-    }
+    scored.forEach((row, index) => {
+      if (beats(row, bestResult)) {
+        bestFitness = row.fitness;
+        best = population[index].map(gene => ({ ...gene }));
+        bestResult = row;
+      }
+    });
     history.push({
       generation,
       best: bestFitness,
       mean: fitness.reduce((sum, value) => sum + value, 0) / fitness.length
     });
-    if (onStep) onStep(generation, generations);
   }
   return { best, result: bestResult, history };
 }
@@ -551,7 +628,10 @@ function signed(value) {
 function render(best, result) {
   document.getElementById("score").innerHTML = signed(result.fitness) + " <span>/ +4</span>";
   document.getElementById("summary").textContent =
-    formatKcal(result.kcal) + " kcal · " + formatMins(result.minutes) + " min · " + result.hr.toFixed(0) + "% MHR";
+    formatKcal(result.kcal) + " kcal · " + formatMins(result.minutes) + " min · " + result.hr.toFixed(0) + "% MHR · "
+    + (result.focusMinutes > 0
+      ? formatMins(result.focusMinutes) + " min on " + document.getElementById("focus").value
+      : result.goalCovered.length + "/" + result.goalTotal + " domains");
 
   const session = document.getElementById("session");
   session.replaceChildren();
@@ -622,7 +702,16 @@ function render(best, result) {
     const cell = document.createElement("div");
     cell.className = "dom" + (result.domains.includes(domain) ? " on" : "");
     cell.textContent = domain;
+    cell.title = DOMAIN_NAMES[domain];
     domains.appendChild(cell);
+  });
+
+  const key = document.getElementById("domain-key");
+  key.replaceChildren();
+  ALL_DOMAINS.forEach(domain => {
+    const item = document.createElement("span");
+    item.textContent = domain + " " + DOMAIN_NAMES[domain];
+    key.appendChild(item);
   });
 }
 
@@ -671,13 +760,50 @@ function readProfile() {
     bmi: Number(document.getElementById("bmi").value),
     gender: document.getElementById("gender").value,
     age: Number(document.getElementById("age").value),
-    resting: Number(document.getElementById("rhr").value)
+    resting: Number(document.getElementById("rhr").value),
+    focus: document.getElementById("focus").value
   };
 }
 
-function runPlanner() {
+let planToken = 0;
+
+function applyCalories(result, calories, goal) {
+  result.blockKcal = calories;
+  result.kcal = calories.reduce((sum, value) => sum + value, 0);
+  result.parts.cal = checkScore(result.kcal >= goal.cal[0] && result.kcal <= goal.cal[1]);
+  result.fitness = result.parts.cal + result.parts.met + result.parts.rpe + result.parts.hr;
+}
+
+async function fetchCalories(profile, best) {
+  const response = await fetch("/api/calories", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      profile: { weight: profile.weight },
+      blocks: best.map(gene => ({
+        exercise: gene.activity.name,
+        duration: gene.duration
+      }))
+    }),
+    signal: AbortSignal.timeout(2000)
+  });
+  if (!response.ok) throw new Error("calorie request failed");
+  const payload = await response.json();
+  if (!Array.isArray(payload.calories) || payload.calories.length !== best.length) {
+    throw new Error("calorie response");
+  }
+  return payload.calories.map(Number);
+}
+
+async function runPlanner() {
   const profile = readProfile();
   const goalName = document.querySelector('input[name="goal"]:checked').value;
+  const focus = profile.focus || "all";
+  const goal = {
+    ...GOALS[goalName],
+    focus,
+    domains: focus === "all" ? ALL_DOMAINS.slice() : [focus]
+  };
   const status = document.getElementById("status");
   const valid = profile.weight >= 40 && profile.weight <= 160
     && profile.dream >= 40 && profile.dream <= 160
@@ -689,16 +815,42 @@ function runPlanner() {
     status.textContent = "Check body mass, dream weight, BMI, age and resting heart rate.";
     return;
   }
+  const token = ++planToken;
   status.textContent = "Planning the session…";
-  const { best, result, history } = evolve(profile, GOALS[goalName]);
+  const { best, result, history } = evolve(profile, goal, profileSeed(profile, goalName));
+  let source = "table in the page";
+  try {
+    const calories = await fetchCalories(profile, best);
+    if (token !== planToken) return;
+    const agrees = calories.every((value, index) => Math.abs(value - result.blockKcal[index]) < 0.05);
+    if (agrees) {
+      applyCalories(result, calories, goal);
+      source = "activity table";
+    }
+  } catch (error) {
+    if (token !== planToken) return;
+  }
   render(best, result);
   drawChart(history);
-  status.textContent = "Lecture checks · generation " + (history.length - 1) + " · best " + signed(result.fitness);
+  status.textContent = "Lecture checks · generation " + (history.length - 1)
+    + " · best " + signed(result.fitness) + " · " + source;
 }
 
 document.getElementById("planner").addEventListener("submit", event => {
   event.preventDefault();
   runPlanner();
+});
+let planTimer = null;
+function schedulePlan() {
+  clearTimeout(planTimer);
+  planTimer = setTimeout(runPlanner, 300);
+}
+["weight", "dream", "bmi", "age", "rhr", "gender", "focus"].forEach(id => {
+  document.getElementById(id).addEventListener("input", schedulePlan);
+  document.getElementById(id).addEventListener("change", schedulePlan);
+});
+document.querySelectorAll('input[name="goal"]').forEach(input => {
+  input.addEventListener("change", schedulePlan);
 });
 setInterval(() => {
   const wall = document.getElementById("wall");

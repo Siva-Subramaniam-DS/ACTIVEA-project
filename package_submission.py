@@ -27,6 +27,7 @@ INCLUDED_FILES = [
     "run_all_experiments.py",
     "run_comparison.py",
     "convert_endomondo_to_csv.py",
+    "exercise_dataset.csv",
     "create_notebook.py",
     "ACTIVEA_EDA_and_Model_Optimization.ipynb",
     "requirements.txt",

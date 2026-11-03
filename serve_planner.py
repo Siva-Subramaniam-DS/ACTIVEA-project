@@ -1,104 +1,44 @@
-"""Serve the planner and score calories with the saved model.
+"""Serve the planner page and the calorie calculation.
 
-The browser cannot load a scikit-learn file directly. This program loads
-Model/best_calorie_model.joblib (trained on endomondoHR.csv) and answers
-the page at /api/calories.
+Calories follow the coursework table. The printed rate is for 70 kg, and the
+typed body mass scales it: kcal/min = table rate * (body mass / 70).
+The saved Endomondo model is not used here. It has no body-mass input, and
+mapping yoga or rope skipping onto another sport produced the wrong calories.
 Open http://127.0.0.1:8767/ after starting it.
 """
 
 from __future__ import annotations
 
-import sys
 import json
-import warnings
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlparse
 
-import pandas as pd
-from sklearn.exceptions import InconsistentVersionWarning
-
-# Scikit-Learn cross-version unpickling compatibility
-warnings.filterwarnings("ignore", category=InconsistentVersionWarning)
-try:
-    import sklearn.compose._column_transformer as column_transformer
-    if not hasattr(column_transformer, "_RemainderColsList"):
-        class _RemainderColsList(list):
-            pass
-        column_transformer._RemainderColsList = _RemainderColsList
-except Exception:
-    pass
-
-try:
-    from sklearn._loss import _loss
-    sys.modules["_loss"] = _loss
-except Exception:
-    pass
-
-import joblib
+from activea.data_loader import ExerciseKnowledgeBase
 
 ROOT = Path(__file__).resolve().parent
 WEB = ROOT / "web"
-MODEL_PATH = ROOT / "Model" / "best_calorie_model.joblib"
-MODEL = joblib.load(MODEL_PATH)
-
-# Activity mapping from Coursework Exercises to Endomondo telemetry features
-SPORT_MAP = {
-    "Exercise 1": ("run", 8.5),
-    "Exercise 2": ("core stability training", 2.0),
-    "Exercise 3": ("bike", 22.0),
-    "Exercise 4": ("core stability training", 1.0),
-    "Exercise 5": ("core stability training", 1.0),
-    "Exercise 6": ("indoor cycling", 12.0),
-    "Exercise 7": ("run", 10.5),
-    "Exercise 8": ("walk", 5.5),
-    "Exercise 9": ("core stability training", 2.5),
-    "Exercise 10": ("orienteering", 9.0),
-    "Jogging": ("run", 8.5),
-    "Bodyweight squats": ("core stability training", 2.0),
-    "Cycling (moderate)": ("bike", 22.0),
-    "Plank": ("core stability training", 1.0),
-    "Yoga": ("core stability training", 1.0),
-    "Rope skipping": ("indoor cycling", 12.0),
-    "Running": ("run", 10.5),
-    "Brisk walking": ("walk", 5.5),
-    "Pushups & Calisthenics": ("core stability training", 2.5),
-    "Agility drills & Burpees": ("orienteering", 9.0),
-}
+ACTIVITIES = ExerciseKnowledgeBase.get_default_activities()
 
 
 def predict_calories(profile: dict, blocks: list[dict]) -> list[float]:
+    """Return one calorie total per block, scaled by the typed body mass."""
     if not blocks:
         return []
-    age = float(profile.get("age", 30.0))
-    gender = str(profile.get("gender", "male")).lower()
-    resting = float(profile.get("resting", 60.0))
-
-    rows = []
+    weight = float(profile.get("weight", 70.0))
+    if weight <= 0:
+        raise ValueError("body mass must be positive")
+    calories = []
     for block in blocks:
-        hr_pct = float(block.get("hr", 70.0))
-        duration = float(block.get("duration", 15.0))
-        heart_rate = resting + (hr_pct / 100.0) * (220.0 - age - resting)
-        ex_key = str(block.get("exercise", "Exercise 1"))
-
-        sport, speed = SPORT_MAP.get(ex_key, ("run", 8.0))
-        dist_km = speed * (duration / 60.0)
-
-        rows.append({
-            "duration_min": duration,
-            "heart_rate_avg": heart_rate,
-            "heart_rate_max": heart_rate + 15.0,
-            "heart_rate_std": 8.5,
-            "speed_avg_kmh": speed,
-            "elevation_gain_m": 15.0,
-            "distance_km": dist_km,
-            "sport": sport,
-            "gender": gender
-        })
-
-    df_input = pd.DataFrame(rows)
-    predictions = MODEL.predict(df_input)
-    return [round(float(value), 1) for value in predictions]
+        name = str(block.get("exercise", ""))
+        activity = ACTIVITIES.get(name)
+        if activity is None:
+            raise KeyError(name)
+        duration = float(block.get("duration", 0.0))
+        if duration < 0:
+            raise ValueError("duration must be zero or positive")
+        calories.append(round(activity.calories_per_min(weight) * duration, 4))
+    return calories
 
 
 class PlannerHandler(BaseHTTPRequestHandler):
@@ -146,7 +86,7 @@ class PlannerHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(body)
             return
-        body = json.dumps({"calories": calories})
+        body = json.dumps({"calories": calories, "source": "table"})
         encoded = body.encode("utf-8")
         self.send_response(200)
         self._cors()
@@ -168,7 +108,7 @@ def main():
     server = ThreadingHTTPServer(("127.0.0.1", 8767), PlannerHandler)
     print("=" * 60)
     print("ACTIVEA Interactive Session Planner Server")
-    print(f"Loaded Champion Model: {MODEL_PATH.name}")
+    print("Calories: coursework table scaled by body mass / 70.")
     print("Open http://127.0.0.1:8767/ in your browser.")
     print("Press Ctrl+C to stop.")
     print("=" * 60, flush=True)
